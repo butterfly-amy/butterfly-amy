@@ -3677,3 +3677,153 @@ body.gallery-open {
     border-radius: 13px;
   }
 }
+/* Add this to the VERY BOTTOM of style.css */
+
+/* =========================================================
+   FAVORITES — PICTURES ONLY, SAME SIZE, SIDE BY SIDE
+========================================================= */
+
+.overlay-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.overlay-image-card {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  display: block;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.overlay-image-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 350ms ease, filter 350ms ease;
+}
+
+.overlay-image-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(199, 168, 255, 0.45);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.35), 0 0 22px rgba(164, 121, 255, 0.12);
+}
+
+.overlay-image-card:hover img {
+  transform: scale(1.06);
+  filter: brightness(0.86) saturate(1.08);
+}
+
+/* Remove spacing inherited from the old text cards */
+.overlay-image-card h3,
+.overlay-image-card p {
+  display: none;
+}
+
+/* =========================================================
+   FAVORITES LIGHTBOX
+========================================================= */
+
+.favorites-lightbox[hidden] {
+  display: none;
+}
+
+.favorites-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: grid;
+  place-items: center;
+  padding: 60px 90px;
+  background: rgba(0, 0, 0, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.favorites-lightbox img {
+  display: block;
+  max-width: min(1050px, 88vw);
+  max-height: 86vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 18px;
+  box-shadow: 0 25px 90px rgba(0, 0, 0, 0.75);
+}
+
+.favorites-lightbox-close,
+.favorites-lightbox-arrow {
+  position: fixed;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  cursor: pointer;
+}
+
+.favorites-lightbox-close {
+  top: 24px;
+  right: 28px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  font-size: 29px;
+}
+
+.favorites-lightbox-arrow {
+  top: 50%;
+  width: 50px;
+  height: 66px;
+  transform: translateY(-50%);
+  border-radius: 18px;
+  font-size: 42px;
+}
+
+.favorites-lightbox-previous { left: 25px; }
+.favorites-lightbox-next { right: 25px; }
+
+.favorites-lightbox-close:hover,
+.favorites-lightbox-arrow:hover {
+  background: rgba(199, 168, 255, 0.19);
+}
+
+body.favorites-lightbox-open {
+  overflow: hidden;
+}
+
+@media (max-width: 700px) {
+  .overlay-gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+    gap: 10px;
+  }
+
+  .overlay-image-card {
+    border-radius: 13px;
+  }
+
+  .favorites-lightbox {
+    padding: 60px 14px 82px;
+  }
+
+  .favorites-lightbox-arrow {
+    top: auto;
+    bottom: 18px;
+    width: 48px;
+    height: 48px;
+    transform: none;
+    border-radius: 50%;
+  }
+
+  .favorites-lightbox-previous { left: calc(50% - 62px); }
+  .favorites-lightbox-next { right: calc(50% - 62px); }
+}
