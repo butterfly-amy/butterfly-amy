@@ -20,7 +20,7 @@
 
 <body>
 
-  <!-- Decorative background layers -->
+  <!-- Decorative background -->
   <div class="cosmic-background" aria-hidden="true">
 
     <div class="stars stars-small"></div>
@@ -37,7 +37,6 @@
 
   <!-- Cursor effects -->
   <div id="cursorGlow" aria-hidden="true"></div>
-
   <div id="cursorParticles" aria-hidden="true"></div>
 
 
@@ -56,7 +55,7 @@
   </div>
 
 
-  <!-- Main navigation -->
+  <!-- Header -->
   <header class="site-header">
 
     <a class="site-logo" href="#home">
@@ -358,80 +357,33 @@
             <dl class="information-list">
 
               <div>
-
-                <dt>
-                  Name
-                </dt>
-
-                <dd>
-                  Amy
-                </dd>
-
+                <dt>Name</dt>
+                <dd>Amy</dd>
               </div>
 
-
               <div>
-
-                <dt>
-                  Age
-                </dt>
-
-                <dd>
-                  18
-                </dd>
-
+                <dt>Age</dt>
+                <dd>18</dd>
               </div>
 
-
               <div>
-
-                <dt>
-                  Languages
-                </dt>
-
-                <dd>
-                  English, German and more
-                </dd>
-
+                <dt>Languages</dt>
+                <dd>English, German and more</dd>
               </div>
 
-
               <div>
-
-                <dt>
-                  Personality
-                </dt>
-
-                <dd>
-                  Curious, chaotic and chronically awake
-                </dd>
-
+                <dt>Personality</dt>
+                <dd>Curious, chaotic and chronically awake</dd>
               </div>
 
-
               <div>
-
-                <dt>
-                  Weakness
-                </dt>
-
-                <dd>
-                  Monster Energy and fictional characters
-                </dd>
-
+                <dt>Weakness</dt>
+                <dd>Monster Energy and fictional characters</dd>
               </div>
 
-
               <div>
-
-                <dt>
-                  Usually found
-                </dt>
-
-                <dd>
-                  On my laptop
-                </dd>
-
+                <dt>Usually found</dt>
+                <dd>On my laptop</dd>
               </div>
 
             </dl>
@@ -479,8 +431,8 @@
         </h2>
 
         <p>
-          Characters, games, stories and songs that have
-          completely taken over my mind.
+          Characters, games, stories and other things
+          that have completely taken over my mind.
         </p>
 
       </div>
@@ -516,12 +468,13 @@
               and think about far more than necessary.
             </p>
 
-            <a
-              href="favorite-characters.html"
-              class="world-link"
+            <button
+              class="world-link collection-open-button"
+              type="button"
+              data-open-collection="characters"
             >
               Meet them
-            </a>
+            </button>
 
           </div>
 
@@ -553,15 +506,16 @@
 
             <p>
               Games I love playing, obsessing over
-              and occasionally spending far too many hours on.
+              and spending far too many hours on.
             </p>
 
-            <a
-              href="favorite-games.html"
-              class="world-link"
+            <button
+              class="world-link collection-open-button"
+              type="button"
+              data-open-collection="games"
             >
               See my games
-            </a>
+            </button>
 
           </div>
 
@@ -596,19 +550,20 @@
               else that has emotionally destroyed me.
             </p>
 
-            <a
-              href="favorite-stories.html"
-              class="world-link"
+            <button
+              class="world-link collection-open-button"
+              type="button"
+              data-open-collection="stories"
             >
               View my favorites
-            </a>
+            </button>
 
           </div>
 
         </article>
 
 
-        <!-- Favorite music -->
+        <!-- Random favorites -->
         <article
           class="world-card"
           data-world="dreams"
@@ -620,28 +575,29 @@
           <div class="world-card-content">
 
             <span class="world-icon">
-              ♫
+              ✦
             </span>
 
             <p class="small-label">
-              Permanently on repeat
+              A bit of everything
             </p>
 
             <h3>
-              Favorite Music
+              Random Favorites
             </h3>
 
             <p>
-              Songs, artists and albums connected to
-              different moods, memories and phases of my life.
+              Drinks, animals, aesthetics, places,
+              colours and random things I love.
             </p>
 
-            <a
-              href="#music"
-              class="world-link"
+            <button
+              class="world-link collection-open-button"
+              type="button"
+              data-open-collection="random"
             >
-              See my music
-            </a>
+              Look inside
+            </button>
 
           </div>
 
@@ -691,13 +647,8 @@
             type="button"
             data-interest="coding"
           >
-
             <span>✦</span>
-
-            <strong>
-              Coding
-            </strong>
-
+            <strong>Coding</strong>
           </button>
 
 
@@ -706,13 +657,8 @@
             type="button"
             data-interest="stories"
           >
-
             <span>✦</span>
-
-            <strong>
-              Stories
-            </strong>
-
+            <strong>Stories</strong>
           </button>
 
 
@@ -721,13 +667,8 @@
             type="button"
             data-interest="art"
           >
-
             <span>✦</span>
-
-            <strong>
-              Art
-            </strong>
-
+            <strong>Art</strong>
           </button>
 
 
@@ -736,13 +677,8 @@
             type="button"
             data-interest="psychology"
           >
-
             <span>✦</span>
-
-            <strong>
-              Psychology
-            </strong>
-
+            <strong>Psychology</strong>
           </button>
 
 
@@ -751,13 +687,8 @@
             type="button"
             data-interest="philosophy"
           >
-
             <span>✦</span>
-
-            <strong>
-              Philosophy
-            </strong>
-
+            <strong>Philosophy</strong>
           </button>
 
 
@@ -766,13 +697,8 @@
             type="button"
             data-interest="languages"
           >
-
             <span>✦</span>
-
-            <strong>
-              Languages
-            </strong>
-
+            <strong>Languages</strong>
           </button>
 
 
@@ -781,13 +707,8 @@
             type="button"
             data-interest="games"
           >
-
             <span>✦</span>
-
-            <strong>
-              Games
-            </strong>
-
+            <strong>Games</strong>
           </button>
 
 
@@ -796,13 +717,8 @@
             type="button"
             data-interest="books"
           >
-
             <span>✦</span>
-
-            <strong>
-              Books
-            </strong>
-
+            <strong>Books</strong>
           </button>
 
 
@@ -867,14 +783,12 @@
 
       <div class="world-grid">
 
-        <!-- Currently playing -->
         <article
           class="world-card"
           data-world="games"
         >
 
           <div class="world-card-background"></div>
-
 
           <div class="world-card-content">
 
@@ -900,14 +814,12 @@
         </article>
 
 
-        <!-- Currently reading -->
         <article
           class="world-card"
           data-world="archive"
         >
 
           <div class="world-card-background"></div>
-
 
           <div class="world-card-content">
 
@@ -933,14 +845,12 @@
         </article>
 
 
-        <!-- Current obsession -->
         <article
           class="world-card"
           data-world="stories"
         >
 
           <div class="world-card-background"></div>
-
 
           <div class="world-card-content">
 
@@ -966,14 +876,12 @@
         </article>
 
 
-        <!-- Currently learning -->
         <article
           class="world-card"
           data-world="dreams"
         >
 
           <div class="world-card-background"></div>
-
 
           <div class="world-card-content">
 
@@ -1008,7 +916,7 @@
     ====================================================== -->
 
     <section
-      class="content-section worlds-section"
+      class="content-section music-section"
       id="music"
     >
 
@@ -1019,7 +927,7 @@
         </p>
 
         <h2>
-          Music
+          My Music
         </h2>
 
         <p>
@@ -1030,172 +938,1042 @@
       </div>
 
 
-      <div class="world-grid">
+      <div class="playlist-card">
 
-        <!-- Song one -->
-        <article
-          class="world-card"
-          data-world="archive"
-        >
+        <div class="playlist-header">
 
-          <div class="world-card-background"></div>
+          <span>#</span>
+
+          <span>Title</span>
+
+          <span>Album</span>
+
+          <span>Time</span>
+
+          <span class="playlist-play-column">
+            Play
+          </span>
+
+        </div>
 
 
-          <div class="world-card-content">
+        <div class="song-list">
 
-            <span class="world-icon">
-              ♫
+          <!-- Song 1 -->
+          <article
+            class="song-row"
+            data-song-source="audio/telepatia.mp3"
+            data-song-title="telepatía"
+          >
+
+            <span class="song-number">
+              1
             </span>
 
-            <p class="small-label">
-              Favorite song
+
+            <div class="song-main-information">
+
+              <img
+                class="song-cover"
+                src="images/music/telepatia.jpg"
+                alt="telepatía cover"
+              >
+
+              <div>
+
+                <h3>
+                  telepatía
+                </h3>
+
+                <p>
+                  Kali Uchis
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <p class="song-album">
+              Sin Miedo
             </p>
 
-            <h3>
-              Add song title
-            </h3>
 
-            <p>
-              Add the artist and something you
-              like about this song.
-            </p>
-
-            <a
-              href="#"
-              class="world-link"
-            >
-              Play later
-            </a>
-
-          </div>
-
-        </article>
-
-
-        <!-- Song two -->
-        <article
-          class="world-card"
-          data-world="stories"
-        >
-
-          <div class="world-card-background"></div>
-
-
-          <div class="world-card-content">
-
-            <span class="world-icon">
-              ♫
+            <span class="song-duration">
+              2:40
             </span>
 
-            <p class="small-label">
-              Permanently on repeat
-            </p>
 
-            <h3>
-              Add song title
-            </h3>
-
-            <p>
-              Add the artist and something you
-              like about this song.
-            </p>
-
-            <a
-              href="#"
-              class="world-link"
+            <button
+              class="song-play-button"
+              type="button"
+              aria-label="Play telepatía"
             >
-              Play later
-            </a>
+              ▶
+            </button>
 
-          </div>
-
-        </article>
+          </article>
 
 
-        <!-- Song three -->
-        <article
-          class="world-card"
-          data-world="games"
-        >
+          <!-- Song 2 -->
+          <article
+            class="song-row"
+            data-song-source="audio/beautiful-boy.mp3"
+            data-song-title="Beautiful Boy"
+          >
 
-          <div class="world-card-background"></div>
-
-
-          <div class="world-card-content">
-
-            <span class="world-icon">
-              ♫
+            <span class="song-number">
+              2
             </span>
 
-            <p class="small-label">
-              For late nights
+
+            <div class="song-main-information">
+
+              <img
+                class="song-cover"
+                src="images/music/beautiful-boy.jpg"
+                alt="Beautiful Boy cover"
+              >
+
+              <div>
+
+                <h3>
+                  Beautiful Boy
+                </h3>
+
+                <p>
+                  John Lennon
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <p class="song-album">
+              Double Fantasy
             </p>
 
-            <h3>
-              Add song title
-            </h3>
 
-            <p>
-              Add the artist and something you
-              like about this song.
-            </p>
-
-            <a
-              href="#"
-              class="world-link"
-            >
-              Play later
-            </a>
-
-          </div>
-
-        </article>
-
-
-        <!-- Song four -->
-        <article
-          class="world-card"
-          data-world="dreams"
-        >
-
-          <div class="world-card-background"></div>
-
-
-          <div class="world-card-content">
-
-            <span class="world-icon">
-              ♫
+            <span class="song-duration">
+              4:05
             </span>
 
-            <p class="small-label">
-              Emotionally attached
-            </p>
 
-            <h3>
-              Add song title
-            </h3>
-
-            <p>
-              Add the artist and something you
-              like about this song.
-            </p>
-
-            <a
-              href="#"
-              class="world-link"
+            <button
+              class="song-play-button"
+              type="button"
+              aria-label="Play Beautiful Boy"
             >
-              Play later
-            </a>
+              ▶
+            </button>
 
-          </div>
+          </article>
 
-        </article>
+
+          <!-- Song 3 -->
+          <article
+            class="song-row"
+            data-song-source="audio/die-with-a-smile.mp3"
+            data-song-title="Die With A Smile"
+          >
+
+            <span class="song-number">
+              3
+            </span>
+
+
+            <div class="song-main-information">
+
+              <img
+                class="song-cover"
+                src="images/music/die-with-a-smile.jpg"
+                alt="Die With A Smile cover"
+              >
+
+              <div>
+
+                <h3>
+                  Die With A Smile
+                </h3>
+
+                <p>
+                  Lady Gaga, Bruno Mars
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <p class="song-album">
+              Die With A Smile
+            </p>
+
+
+            <span class="song-duration">
+              4:11
+            </span>
+
+
+            <button
+              class="song-play-button"
+              type="button"
+              aria-label="Play Die With A Smile"
+            >
+              ▶
+            </button>
+
+          </article>
+
+
+          <!-- Song 4 -->
+          <article
+            class="song-row"
+            data-song-source="audio/closer.mp3"
+            data-song-title="Closer"
+          >
+
+            <span class="song-number">
+              4
+            </span>
+
+
+            <div class="song-main-information">
+
+              <img
+                class="song-cover"
+                src="images/music/closer.jpg"
+                alt="Closer cover"
+              >
+
+              <div>
+
+                <h3>
+                  Closer
+                </h3>
+
+                <p>
+                  The Chainsmokers, Halsey
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <p class="song-album">
+              Closer
+            </p>
+
+
+            <span class="song-duration">
+              4:04
+            </span>
+
+
+            <button
+              class="song-play-button"
+              type="button"
+              aria-label="Play Closer"
+            >
+              ▶
+            </button>
+
+          </article>
+
+
+          <!-- Song 5 -->
+          <article
+            class="song-row"
+            data-song-source="audio/denial-is-a-river.mp3"
+            data-song-title="DENIAL IS A RIVER"
+          >
+
+            <span class="song-number">
+              5
+            </span>
+
+
+            <div class="song-main-information">
+
+              <img
+                class="song-cover"
+                src="images/music/denial-is-a-river.jpg"
+                alt="DENIAL IS A RIVER cover"
+              >
+
+              <div>
+
+                <h3>
+                  DENIAL IS A RIVER
+                </h3>
+
+                <p>
+                  Doechii
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <p class="song-album">
+              Alligator Bites Never Heal
+            </p>
+
+
+            <span class="song-duration">
+              2:39
+            </span>
+
+
+            <button
+              class="song-play-button"
+              type="button"
+              aria-label="Play DENIAL IS A RIVER"
+            >
+              ▶
+            </button>
+
+          </article>
+
+
+          <!-- Song 6 -->
+          <article
+            class="song-row"
+            data-song-source="audio/good-girls-bad-guys.mp3"
+            data-song-title="Good Girls Bad Guys"
+          >
+
+            <span class="song-number">
+              6
+            </span>
+
+
+            <div class="song-main-information">
+
+              <img
+                class="song-cover"
+                src="images/music/good-girls-bad-guys.jpg"
+                alt="Good Girls Bad Guys cover"
+              >
+
+              <div>
+
+                <h3>
+                  Good Girls Bad Guys
+                </h3>
+
+                <p>
+                  Falling In Reverse
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <p class="song-album">
+              The Drug In Me Is You
+            </p>
+
+
+            <span class="song-duration">
+              3:15
+            </span>
+
+
+            <button
+              class="song-play-button"
+              type="button"
+              aria-label="Play Good Girls Bad Guys"
+            >
+              ▶
+            </button>
+
+          </article>
+
+        </div>
 
       </div>
 
     </section>
 
   </main>
+
+
+  <!-- =====================================================
+       FAVORITE CHARACTERS OVERLAY
+  ====================================================== -->
+
+  <div
+    class="collection-modal"
+    id="charactersCollection"
+    data-collection="characters"
+    hidden
+  >
+
+    <div
+      class="collection-overlay"
+      data-close-collection
+    ></div>
+
+
+    <section
+      class="collection-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="charactersCollectionTitle"
+    >
+
+      <header class="collection-panel-header">
+
+        <div>
+
+          <p class="small-label">
+            My fictional attachments
+          </p>
+
+          <h2 id="charactersCollectionTitle">
+            Favorite Characters
+          </h2>
+
+          <p>
+            Characters I love, relate to or simply refuse
+            to stop thinking about.
+          </p>
+
+        </div>
+
+
+        <button
+          class="collection-close-button"
+          type="button"
+          aria-label="Close favorite characters"
+          data-close-collection
+        >
+          ×
+        </button>
+
+      </header>
+
+
+      <div class="collection-scroll-area">
+
+        <div class="favorite-item-grid">
+
+          <article class="favorite-item-card">
+
+            <img
+              src="images/characters/chu-wanning.jpg"
+              alt="Chu Wanning"
+            >
+
+            <div>
+
+              <p class="small-label">
+                The Husky and His White Cat Shizun
+              </p>
+
+              <h3>
+                Chu Wanning
+              </h3>
+
+              <p>
+                Add something about why you love him here.
+              </p>
+
+            </div>
+
+          </article>
+
+
+          <article class="favorite-item-card">
+
+            <img
+              src="images/characters/xie-lian.jpg"
+              alt="Xie Lian"
+            >
+
+            <div>
+
+              <p class="small-label">
+                Heaven Official's Blessing
+              </p>
+
+              <h3>
+                Xie Lian
+              </h3>
+
+              <p>
+                Add something about why you love him here.
+              </p>
+
+            </div>
+
+          </article>
+
+
+          <article class="favorite-item-card">
+
+            <img
+              src="images/characters/hua-cheng.jpg"
+              alt="Hua Cheng"
+            >
+
+            <div>
+
+              <p class="small-label">
+                Heaven Official's Blessing
+              </p>
+
+              <h3>
+                Hua Cheng
+              </h3>
+
+              <p>
+                Add something about why you love him here.
+              </p>
+
+            </div>
+
+          </article>
+
+
+          <article class="favorite-item-card">
+
+            <img
+              src="images/characters/klein-moretti.jpg"
+              alt="Klein Moretti"
+            >
+
+            <div>
+
+              <p class="small-label">
+                Lord of the Mysteries
+              </p>
+
+              <h3>
+                Klein Moretti
+              </h3>
+
+              <p>
+                Add something about why you love him here.
+              </p>
+
+            </div>
+
+          </article>
+
+
+          <article class="favorite-item-card">
+
+            <img
+              src="images/characters/amon.jpg"
+              alt="Amon"
+            >
+
+            <div>
+
+              <p class="small-label">
+                Lord of the Mysteries
+              </p>
+
+              <h3>
+                Amon
+              </h3>
+
+              <p>
+                Add something about why you love him here.
+              </p>
+
+            </div>
+
+          </article>
+
+
+          <article class="favorite-item-card">
+
+            <img
+              src="images/characters/add-character.jpg"
+              alt="Add another character"
+            >
+
+            <div>
+
+              <p class="small-label">
+                Add another one
+              </p>
+
+              <h3>
+                Character Name
+              </h3>
+
+              <p>
+                Add another favorite character here.
+              </p>
+
+            </div>
+
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <!-- =====================================================
+       FAVORITE GAMES OVERLAY
+  ====================================================== -->
+
+  <div
+    class="collection-modal"
+    id="gamesCollection"
+    data-collection="games"
+    hidden
+  >
+
+    <div
+      class="collection-overlay"
+      data-close-collection
+    ></div>
+
+
+    <section
+      class="collection-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="gamesCollectionTitle"
+    >
+
+      <header class="collection-panel-header">
+
+        <div>
+
+          <p class="small-label">
+            Games I always return to
+          </p>
+
+          <h2 id="gamesCollectionTitle">
+            Favorite Games
+          </h2>
+
+          <p>
+            Games that entertained me, traumatised me
+            or completely stole my free time.
+          </p>
+
+        </div>
+
+
+        <button
+          class="collection-close-button"
+          type="button"
+          aria-label="Close favorite games"
+          data-close-collection
+        >
+          ×
+        </button>
+
+      </header>
+
+
+      <div class="collection-scroll-area">
+
+        <div class="favorite-item-grid">
+
+          <article class="favorite-item-card">
+
+            <img
+              src="images/games/genshin-impact.jpg"
+              alt="Genshin Impact"
+            >
+
+            <div>
+
+              <p class="small-label">
+                RPG
+              </p>
+
+              <h3>
+                Genshin Impact
+              </h3>
+
+              <p>
+                Add why you like the game here.
+              </p>
+
+            </div>
+
+          </article>
+
+
+          <article class="favorite-item-card">
+
+            <img
+              src="images/games/hollow-knight.jpg"
+              alt="Hollow Knight"
+            >
+
+            <div>
+
+              <p class="small-label">
+                Metroidvania
+              </p>
+
+              <h3>
+                Hollow Knight
+              </h3>
+
+              <p>
+                Add why you like the game here.
+              </p>
+
+            </div>
+
+          </article>
+
+
+          <article class="favorite-item-card">
+
+            <img
+              src="images/games/minecraft.jpg"
+              alt="Minecraft"
+            >
+
+            <div>
+
+              <p class="small-label">
+                Sandbox
+              </p>
+
+              <h3>
+                Minecraft
+              </h3>
+
+              <p>
+                Add why you like the game here.
+              </p>
+
+            </div>
+
+          </article>
+
+
+          <article class="favorite-item-card">
+
+            <img
+              src="images/games/roblox.jpg"
+              alt="Roblox"
+            >
+
+            <div>
+
+              <p class="small-label">
+                Platform
+              </p>
+
+              <h3>
+                Roblox
+              </h3>
+
+              <p>
+                Add why you like the game here.
+              </p>
+
+            </div>
+
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <!-- =====================================================
+       FAVORITE STORIES OVERLAY
+  ====================================================== -->
+
+  <div
+    class="collection-modal"
+    id="storiesCollection"
+    data-collection="stories"
+    hidden
+  >
+
+    <div
+      class="collection-overlay"
+      data-close-collection
+    ></div>
+
+
+    <section
+      class="collection-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="storiesCollectionTitle"
+    >
+
+      <header class="collection-panel-header">
+
+        <div>
+
+          <p class="small-label">
+            Books, anime, webtoons and shows
+          </p>
+
+          <h2 id="storiesCollectionTitle">
+            Favorite Stories
+          </h2>
+
+          <p>
+            Stories that stayed in my mind long after
+            I finished them.
+          </p>
+
+        </div>
+
+
+        <button
+          class="collection-close-button"
+          type="button"
+          aria-label="Close favorite stories"
+          data-close-collection
+        >
+          ×
+        </button>
+
+      </header>
+
+
+      <div class="collection-scroll-area">
+
+        <div class="favorite-item-grid">
+
+          <article class="favorite-item-card">
+
+            <img
+              src="images/stories/erha.jpg"
+              alt="The Husky and His White Cat Shizun"
+            >
+
+            <div>
+
+              <p class="small-label">
+                Danmei
+              </p>
+
+              <h3>
+                The Husky and His White Cat Shizun
+              </h3>
+
+              <p>
+                Add what you love about it here.
+              </p>
+
+            </div>
+
+          </article>
+
+
+          <article class="favorite-item-card">
+
+            <img
+              src="images/stories/tgcf.jpg"
+              alt="Heaven Official's Blessing"
+            >
+
+            <div>
+
+              <p class="small-label">
+                Danmei
+              </p>
+
+              <h3>
+                Heaven Official's Blessing
+              </h3>
+
+              <p>
+                Add what you love about it here.
+              </p>
+
+            </div>
+
+          </article>
+
+
+          <article class="favorite-item-card">
+
+            <img
+              src="images/stories/lotm.jpg"
+              alt="Lord of the Mysteries"
+            >
+
+            <div>
+
+              <p class="small-label">
+                Novel
+              </p>
+
+              <h3>
+                Lord of the Mysteries
+              </h3>
+
+              <p>
+                Add what you love about it here.
+              </p>
+
+            </div>
+
+          </article>
+
+
+          <article class="favorite-item-card">
+
+            <img
+              src="images/stories/add-story.jpg"
+              alt="Add another story"
+            >
+
+            <div>
+
+              <p class="small-label">
+                Add another one
+              </p>
+
+              <h3>
+                Story Name
+              </h3>
+
+              <p>
+                Add another favorite story here.
+              </p>
+
+            </div>
+
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <!-- =====================================================
+       RANDOM FAVORITES OVERLAY
+  ====================================================== -->
+
+  <div
+    class="collection-modal"
+    id="randomCollection"
+    data-collection="random"
+    hidden
+  >
+
+    <div
+      class="collection-overlay"
+      data-close-collection
+    ></div>
+
+
+    <section
+      class="collection-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="randomCollectionTitle"
+    >
+
+      <header class="collection-panel-header">
+
+        <div>
+
+          <p class="small-label">
+            A bit of everything
+          </p>
+
+          <h2 id="randomCollectionTitle">
+            Random Favorites
+          </h2>
+
+          <p>
+            Small things that make me happy or describe
+            me surprisingly well.
+          </p>
+
+        </div>
+
+
+        <button
+          class="collection-close-button"
+          type="button"
+          aria-label="Close random favorites"
+          data-close-collection
+        >
+          ×
+        </button>
+
+      </header>
+
+
+      <div class="collection-scroll-area">
+
+        <div class="random-favorites-grid">
+
+          <article class="random-favorite-card">
+            <span>⚡</span>
+            <p class="small-label">Favorite drink</p>
+            <h3>Monster Energy</h3>
+          </article>
+
+          <article class="random-favorite-card">
+            <span>🦋</span>
+            <p class="small-label">Favorite creature</p>
+            <h3>Butterflies</h3>
+          </article>
+
+          <article class="random-favorite-card">
+            <span>🌙</span>
+            <p class="small-label">Favorite time</p>
+            <h3>Late at night</h3>
+          </article>
+
+          <article class="random-favorite-card">
+            <span>🐈</span>
+            <p class="small-label">Favorite animal</p>
+            <h3>Cats</h3>
+          </article>
+
+          <article class="random-favorite-card">
+            <span>💻</span>
+            <p class="small-label">Favorite activity</p>
+            <h3>Being on my laptop</h3>
+          </article>
+
+          <article class="random-favorite-card">
+            <span>💜</span>
+            <p class="small-label">Favorite colour</p>
+            <h3>Add your colour</h3>
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
 
 
   <!-- =====================================================
@@ -1246,10 +2024,11 @@
   </div>
 
 
-  <!-- =====================================================
-       FOOTER
-  ====================================================== -->
+  <!-- One audio player controls all songs -->
+  <audio id="songPlayer"></audio>
 
+
+  <!-- Footer -->
   <footer class="site-footer">
 
     <div class="footer-content">
