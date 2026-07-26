@@ -1652,3 +1652,329 @@ window.addEventListener(
   "load",
   initialiseWebsite
 );
+/* =========================================================
+   PERSONAL GALLERY
+========================================================= */
+
+const openGalleryButton =
+  document.getElementById("openGalleryButton");
+
+const galleryOverlay =
+  document.getElementById("galleryOverlay");
+
+const galleryOverlayBackdrop =
+  document.getElementById("galleryOverlayBackdrop");
+
+const closeGalleryButton =
+  document.getElementById("closeGalleryButton");
+
+
+const galleryLightbox =
+  document.getElementById("galleryLightbox");
+
+const galleryLightboxImage =
+  document.getElementById("galleryLightboxImage");
+
+const closeGalleryLightboxButton =
+  document.getElementById("closeGalleryLightbox");
+
+const previousGalleryImageButton =
+  document.getElementById("previousGalleryImage");
+
+const nextGalleryImageButton =
+  document.getElementById("nextGalleryImage");
+
+
+const galleryItems =
+  document.querySelectorAll(
+    ".personal-gallery-item"
+  );
+
+
+const galleryImages =
+  Array.from(galleryItems)
+    .map((item) => item.querySelector("img"))
+    .filter(Boolean);
+
+
+let currentGalleryImageIndex = 0;
+let galleryButtonThatOpenedOverlay = null;
+
+
+/* Open the main gallery */
+
+function openPersonalGallery() {
+  if (!galleryOverlay) {
+    return;
+  }
+
+
+  galleryButtonThatOpenedOverlay =
+    document.activeElement;
+
+
+  galleryOverlay.hidden = false;
+
+  document.body.classList.add(
+    "gallery-open"
+  );
+
+
+  if (closeGalleryButton) {
+    closeGalleryButton.focus();
+  }
+}
+
+
+/* Close the main gallery */
+
+function closePersonalGallery() {
+  if (!galleryOverlay) {
+    return;
+  }
+
+
+  closeGalleryLightbox();
+
+
+  galleryOverlay.hidden = true;
+
+  document.body.classList.remove(
+    "gallery-open"
+  );
+
+
+  if (
+    galleryButtonThatOpenedOverlay &&
+    typeof galleryButtonThatOpenedOverlay.focus ===
+      "function"
+  ) {
+    galleryButtonThatOpenedOverlay.focus();
+  }
+}
+
+
+/* Open one picture */
+
+function openGalleryLightbox(imageIndex) {
+  if (
+    !galleryLightbox ||
+    !galleryLightboxImage ||
+    galleryImages.length === 0
+  ) {
+    return;
+  }
+
+
+  currentGalleryImageIndex =
+    imageIndex;
+
+
+  const selectedImage =
+    galleryImages[currentGalleryImageIndex];
+
+
+  galleryLightboxImage.src =
+    selectedImage.src;
+
+  galleryLightboxImage.alt =
+    selectedImage.alt ||
+    "Enlarged gallery picture";
+
+
+  galleryLightbox.hidden = false;
+
+  document.body.classList.add(
+    "gallery-open"
+  );
+
+
+  if (closeGalleryLightboxButton) {
+    closeGalleryLightboxButton.focus();
+  }
+}
+
+
+/* Close enlarged picture */
+
+function closeGalleryLightbox() {
+  if (!galleryLightbox) {
+    return;
+  }
+
+
+  galleryLightbox.hidden = true;
+
+
+  if (galleryLightboxImage) {
+    galleryLightboxImage.src = "";
+  }
+
+
+  if (
+    !galleryOverlay ||
+    galleryOverlay.hidden
+  ) {
+    document.body.classList.remove(
+      "gallery-open"
+    );
+  }
+}
+
+
+/* Change enlarged picture */
+
+function showGalleryImage(direction) {
+  if (galleryImages.length === 0) {
+    return;
+  }
+
+
+  currentGalleryImageIndex =
+    (
+      currentGalleryImageIndex +
+      direction +
+      galleryImages.length
+    ) % galleryImages.length;
+
+
+  const selectedImage =
+    galleryImages[currentGalleryImageIndex];
+
+
+  galleryLightboxImage.src =
+    selectedImage.src;
+
+  galleryLightboxImage.alt =
+    selectedImage.alt ||
+    "Enlarged gallery picture";
+}
+
+
+/* Gallery event listeners */
+
+if (openGalleryButton) {
+  openGalleryButton.addEventListener(
+    "click",
+    openPersonalGallery
+  );
+}
+
+
+if (closeGalleryButton) {
+  closeGalleryButton.addEventListener(
+    "click",
+    closePersonalGallery
+  );
+}
+
+
+if (galleryOverlayBackdrop) {
+  galleryOverlayBackdrop.addEventListener(
+    "click",
+    closePersonalGallery
+  );
+}
+
+
+galleryItems.forEach((item, index) => {
+  item.addEventListener(
+    "click",
+    () => {
+      openGalleryLightbox(index);
+    }
+  );
+});
+
+
+if (closeGalleryLightboxButton) {
+  closeGalleryLightboxButton.addEventListener(
+    "click",
+    closeGalleryLightbox
+  );
+}
+
+
+if (previousGalleryImageButton) {
+  previousGalleryImageButton.addEventListener(
+    "click",
+    () => {
+      showGalleryImage(-1);
+    }
+  );
+}
+
+
+if (nextGalleryImageButton) {
+  nextGalleryImageButton.addEventListener(
+    "click",
+    () => {
+      showGalleryImage(1);
+    }
+  );
+}
+
+
+/* Clicking outside the enlarged image closes it */
+
+if (galleryLightbox) {
+  galleryLightbox.addEventListener(
+    "click",
+    (event) => {
+      if (event.target === galleryLightbox) {
+        closeGalleryLightbox();
+      }
+    }
+  );
+}
+
+
+/* Keyboard controls */
+
+document.addEventListener(
+  "keydown",
+  (event) => {
+    const lightboxIsOpen =
+      galleryLightbox &&
+      !galleryLightbox.hidden;
+
+
+    const galleryIsOpen =
+      galleryOverlay &&
+      !galleryOverlay.hidden;
+
+
+    if (
+      lightboxIsOpen &&
+      event.key === "ArrowLeft"
+    ) {
+      showGalleryImage(-1);
+      return;
+    }
+
+
+    if (
+      lightboxIsOpen &&
+      event.key === "ArrowRight"
+    ) {
+      showGalleryImage(1);
+      return;
+    }
+
+
+    if (event.key !== "Escape") {
+      return;
+    }
+
+
+    if (lightboxIsOpen) {
+      closeGalleryLightbox();
+      return;
+    }
+
+
+    if (galleryIsOpen) {
+      closePersonalGallery();
+    }
+  }
+);
