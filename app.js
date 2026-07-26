@@ -1978,3 +1978,120 @@ document.addEventListener(
     }
   }
 );
+/* ==========================================================
+   FAVORITES OVERLAYS
+========================================================== */
+
+const overlayButtons = document.querySelectorAll("[data-open-overlay]");
+const overlays = document.querySelectorAll(".favorite-overlay");
+
+overlayButtons.forEach(button => {
+    button.addEventListener("click", () => {
+        const name = button.dataset.openOverlay;
+        const overlay = document.getElementById(name + "Overlay");
+
+        if (!overlay) return;
+
+        overlay.hidden = false;
+        document.body.classList.add("no-scroll");
+    });
+});
+
+document.querySelectorAll("[data-close-overlay]").forEach(element => {
+    element.addEventListener("click", () => {
+        const overlay = element.closest(".favorite-overlay");
+
+        if (!overlay) return;
+
+        overlay.hidden = true;
+        document.body.classList.remove("no-scroll");
+    });
+});
+
+
+/* ==========================================================
+   FAVORITES LIGHTBOX
+========================================================== */
+
+const favoriteImages = document.querySelectorAll(".overlay-image-card img");
+
+let currentFavoriteIndex = 0;
+
+const lightbox = document.getElementById("galleryLightbox");
+const lightboxImage = document.getElementById("galleryLightboxImage");
+
+const previousButton = document.getElementById("previousGalleryImage");
+const nextButton = document.getElementById("nextGalleryImage");
+const closeButton = document.getElementById("closeGalleryLightbox");
+
+function showFavorite(index) {
+
+    currentFavoriteIndex = index;
+
+    lightboxImage.src = favoriteImages[index].src;
+    lightboxImage.alt = favoriteImages[index].alt;
+
+    lightbox.hidden = false;
+    document.body.classList.add("no-scroll");
+}
+
+favoriteImages.forEach((image, index) => {
+
+    image.addEventListener("click", () => {
+        showFavorite(index);
+    });
+
+});
+
+function closeFavoriteLightbox() {
+
+    lightbox.hidden = true;
+
+    document.body.classList.remove("no-scroll");
+}
+
+closeButton.addEventListener("click", closeFavoriteLightbox);
+
+lightbox.addEventListener("click", e => {
+
+    if (e.target === lightbox)
+        closeFavoriteLightbox();
+
+});
+
+previousButton.addEventListener("click", () => {
+
+    currentFavoriteIndex--;
+
+    if (currentFavoriteIndex < 0)
+        currentFavoriteIndex = favoriteImages.length - 1;
+
+    showFavorite(currentFavoriteIndex);
+
+});
+
+nextButton.addEventListener("click", () => {
+
+    currentFavoriteIndex++;
+
+    if (currentFavoriteIndex >= favoriteImages.length)
+        currentFavoriteIndex = 0;
+
+    showFavorite(currentFavoriteIndex);
+
+});
+
+document.addEventListener("keydown", e => {
+
+    if (lightbox.hidden) return;
+
+    if (e.key === "Escape")
+        closeFavoriteLightbox();
+
+    if (e.key === "ArrowLeft")
+        previousButton.click();
+
+    if (e.key === "ArrowRight")
+        nextButton.click();
+
+});
