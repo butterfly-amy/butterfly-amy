@@ -60,6 +60,23 @@ const modalCloseElements =
   document.querySelectorAll("[data-close-modal]");
 
 
+const overlayOpenButtons =
+  document.querySelectorAll("[data-open-overlay]");
+
+const overlayCloseButtons =
+  document.querySelectorAll("[data-close-overlay]");
+
+const favoriteOverlays =
+  document.querySelectorAll(".favorite-overlay");
+
+
+const songRows =
+  document.querySelectorAll(".song-row");
+
+const songPlayButtons =
+  document.querySelectorAll(".song-play-button");
+
+
 const currentYear =
   document.getElementById("currentYear");
 
@@ -240,6 +257,8 @@ window.addEventListener("resize", () => {
   if (window.innerWidth > 820) {
     closeMobileMenu();
   }
+
+  drawConstellationLines();
 });
 
 
@@ -590,12 +609,6 @@ function drawConstellationLines() {
 }
 
 
-window.addEventListener(
-  "resize",
-  drawConstellationLines
-);
-
-
 /* =========================================================
    8. CONSTELLATION INTERACTION
 ========================================================= */
@@ -738,9 +751,7 @@ function closeInterestModal() {
 
   interestModal.hidden = true;
 
-  document.body.classList.remove(
-    "modal-open"
-  );
+  updateBodyScrollLock();
 }
 
 
@@ -752,19 +763,479 @@ modalCloseElements.forEach((element) => {
 });
 
 
+/* =========================================================
+   10. FAVORITES OVERLAYS
+========================================================= */
+
+let lastOverlayTrigger = null;
+
+
+function getOverlayByName(overlayName) {
+  if (!overlayName) {
+    return null;
+  }
+
+  return document.getElementById(
+    `${overlayName}Overlay`
+  );
+}
+
+
+function openFavoriteOverlay(overlayName, triggerButton) {
+  const selectedOverlay =
+    getOverlayByName(overlayName);
+
+
+  if (!selectedOverlay) {
+    console.warn(
+      `No overlay found for: ${overlayName}`
+    );
+
+    return;
+  }
+
+
+  closeAllFavoriteOverlays(false);
+
+
+  lastOverlayTrigger =
+    triggerButton || null;
+
+
+  selectedOverlay.hidden = false;
+
+  document.body.classList.add(
+    "modal-open"
+  );
+
+
+  const overlayBody =
+    selectedOverlay.querySelector(
+      ".favorite-overlay-body"
+    );
+
+
+  if (overlayBody) {
+    overlayBody.scrollTop = 0;
+  }
+
+
+  const closeButton =
+    selectedOverlay.querySelector(
+      ".overlay-close-button"
+    );
+
+
+  if (closeButton) {
+    closeButton.focus();
+  }
+}
+
+
+function closeFavoriteOverlay(
+  overlay,
+  restoreFocus = true
+) {
+  if (!overlay) {
+    return;
+  }
+
+
+  overlay.hidden = true;
+
+
+  updateBodyScrollLock();
+
+
+  if (
+    restoreFocus &&
+    lastOverlayTrigger
+  ) {
+    lastOverlayTrigger.focus();
+  }
+}
+
+
+function closeAllFavoriteOverlays(
+  restoreFocus = true
+) {
+  let overlayWasOpen = false;
+
+
+  favoriteOverlays.forEach((overlay) => {
+    if (!overlay.hidden) {
+      overlayWasOpen = true;
+      overlay.hidden = true;
+    }
+  });
+
+
+  updateBodyScrollLock();
+
+
+  if (
+    overlayWasOpen &&
+    restoreFocus &&
+    lastOverlayTrigger
+  ) {
+    lastOverlayTrigger.focus();
+  }
+}
+
+
+function updateBodyScrollLock() {
+  const interestModalIsOpen =
+    interestModal &&
+    !interestModal.hidden;
+
+
+  const favoriteOverlayIsOpen =
+    Array.from(favoriteOverlays).some(
+      (overlay) => !overlay.hidden
+    );
+
+
+  document.body.classList.toggle(
+    "modal-open",
+    Boolean(
+      interestModalIsOpen ||
+      favoriteOverlayIsOpen
+    )
+  );
+}
+
+
+overlayOpenButtons.forEach((button) => {
+  button.addEventListener(
+    "click",
+    () => {
+      const overlayName =
+        button.dataset.openOverlay;
+
+      openFavoriteOverlay(
+        overlayName,
+        button
+      );
+    }
+  );
+});
+
+
+overlayCloseButtons.forEach((button) => {
+  button.addEventListener(
+    "click",
+    () => {
+      const overlay =
+        button.closest(
+          ".favorite-overlay"
+        );
+
+      closeFavoriteOverlay(overlay);
+    }
+  );
+});
+
+
+favoriteOverlays.forEach((overlay) => {
+  const backdrop =
+    overlay.querySelector(
+      ".favorite-overlay-backdrop"
+    );
+
+
+  if (backdrop) {
+    backdrop.addEventListener(
+      "click",
+      () => {
+        closeFavoriteOverlay(overlay);
+      }
+    );
+  }
+});
+
+
+/* =========================================================
+   11. SPOTIFY-STYLE MUSIC PLAYER
+========================================================= */
+
+let activeAudio = null;
+let activeSongRow = null;
+let activePlayButton = null;
+
+
+function resetSongButton(button) {
+  if (!button) {
+    return;
+  }
+
+  button.textContent = "▶";
+
+  button.setAttribute(
+    "aria-label",
+    "Play song"
+  );
+}
+
+
+function setSongButtonToPause(button) {
+  if (!button) {
+    return;
+  }
+
+  button.textContent = "❚❚";
+
+  button.setAttribute(
+    "aria-label",
+    "Pause song"
+  );
+}
+
+
+function stopCurrentSong(
+  resetTime = false
+) {
+  if (!activeAudio) {
+    return;
+  }
+
+
+  activeAudio.pause();
+
+
+  if (resetTime) {
+    activeAudio.currentTime = 0;
+  }
+
+
+  if (activeSongRow) {
+    activeSongRow.classList.remove(
+      "playing"
+    );
+  }
+
+
+  resetSongButton(
+    activePlayButton
+  );
+
+
+  if (resetTime) {
+    activeAudio = null;
+    activeSongRow = null;
+    activePlayButton = null;
+  }
+}
+
+
+async function playSong(
+  audio,
+  row,
+  button
+) {
+  if (
+    activeAudio &&
+    activeAudio !== audio
+  ) {
+    stopCurrentSong(true);
+  }
+
+
+  activeAudio = audio;
+  activeSongRow = row;
+  activePlayButton = button;
+
+
+  try {
+    await audio.play();
+
+    row.classList.add(
+      "playing"
+    );
+
+    setSongButtonToPause(
+      button
+    );
+  } catch (error) {
+    console.warn(
+      "The song could not play. Check whether the audio file exists.",
+      error
+    );
+
+    row.classList.remove(
+      "playing"
+    );
+
+    resetSongButton(button);
+  }
+}
+
+
+function pauseSong(
+  audio,
+  row,
+  button
+) {
+  audio.pause();
+
+  row.classList.remove(
+    "playing"
+  );
+
+  resetSongButton(button);
+}
+
+
+function toggleSong(button) {
+  const row =
+    button.closest(".song-row");
+
+
+  if (!row) {
+    return;
+  }
+
+
+  const audio =
+    row.querySelector("audio");
+
+
+  if (!audio) {
+    console.warn(
+      "This song row does not contain an audio element."
+    );
+
+    return;
+  }
+
+
+  if (
+    activeAudio === audio &&
+    !audio.paused
+  ) {
+    pauseSong(
+      audio,
+      row,
+      button
+    );
+
+    return;
+  }
+
+
+  playSong(
+    audio,
+    row,
+    button
+  );
+}
+
+
+songPlayButtons.forEach((button) => {
+  button.addEventListener(
+    "click",
+    () => {
+      toggleSong(button);
+    }
+  );
+});
+
+
+songRows.forEach((row) => {
+  const audio =
+    row.querySelector("audio");
+
+  const button =
+    row.querySelector(
+      ".song-play-button"
+    );
+
+
+  if (!audio || !button) {
+    return;
+  }
+
+
+  audio.addEventListener(
+    "ended",
+    () => {
+      row.classList.remove(
+        "playing"
+      );
+
+      resetSongButton(button);
+
+
+      if (activeAudio === audio) {
+        activeAudio = null;
+        activeSongRow = null;
+        activePlayButton = null;
+      }
+    }
+  );
+
+
+  audio.addEventListener(
+    "error",
+    () => {
+      row.classList.remove(
+        "playing"
+      );
+
+      resetSongButton(button);
+
+      console.warn(
+        "A music file is missing or could not be loaded:",
+        audio.currentSrc || audio.src
+      );
+    }
+  );
+});
+
+
+/* =========================================================
+   12. ESCAPE KEY
+========================================================= */
+
 document.addEventListener(
   "keydown",
   (event) => {
-    if (event.key === "Escape") {
-      closeInterestModal();
-      closeMobileMenu();
+    if (event.key !== "Escape") {
+      return;
     }
+
+
+    const openFavoriteOverlay =
+      Array.from(favoriteOverlays).find(
+        (overlay) => !overlay.hidden
+      );
+
+
+    if (openFavoriteOverlay) {
+      closeFavoriteOverlay(
+        openFavoriteOverlay
+      );
+
+      return;
+    }
+
+
+    if (
+      interestModal &&
+      !interestModal.hidden
+    ) {
+      closeInterestModal();
+
+      return;
+    }
+
+
+    closeMobileMenu();
   }
 );
 
 
 /* =========================================================
-   10. REVEAL ELEMENTS WHILE SCROLLING
+   13. REVEAL ELEMENTS WHILE SCROLLING
 ========================================================= */
 
 const revealElements =
@@ -776,7 +1247,8 @@ const revealElements =
       ".quote-card",
       ".world-card",
       ".constellation-map",
-      ".interest-information"
+      ".interest-information",
+      ".playlist-card"
     ].join(",")
   );
 
@@ -833,7 +1305,7 @@ if ("IntersectionObserver" in window) {
 
 
 /* =========================================================
-   11. CARD TILT
+   14. CARD TILT
 ========================================================= */
 
 const tiltingCards =
@@ -891,7 +1363,7 @@ if (pointerIsFine) {
 
 
 /* =========================================================
-   12. RANDOM SHOOTING STARS
+   15. RANDOM SHOOTING STARS
 ========================================================= */
 
 function createShootingStar() {
@@ -973,7 +1445,7 @@ function scheduleShootingStar() {
 
 
 /* =========================================================
-   13. FLOATING BUTTERFLIES
+   16. FLOATING BUTTERFLIES
 ========================================================= */
 
 function createButterfly() {
@@ -1006,7 +1478,9 @@ function createButterfly() {
     "drop-shadow(0 0 10px rgba(199,168,255,0.55))";
 
 
-  document.body.appendChild(butterfly);
+  document.body.appendChild(
+    butterfly
+  );
 
 
   const verticalMovement =
@@ -1087,7 +1561,7 @@ function scheduleButterfly() {
 
 
 /* =========================================================
-   14. SMOOTH INTERNAL LINKS
+   17. SMOOTH INTERNAL LINKS
 ========================================================= */
 
 const internalLinks =
@@ -1135,7 +1609,7 @@ internalLinks.forEach((link) => {
 
 
 /* =========================================================
-   15. CURRENT YEAR
+   18. CURRENT YEAR
 ========================================================= */
 
 if (currentYear) {
@@ -1145,10 +1619,20 @@ if (currentYear) {
 
 
 /* =========================================================
-   16. INITIAL SETUP
+   19. INITIAL SETUP
 ========================================================= */
 
 function initialiseWebsite() {
+  favoriteOverlays.forEach((overlay) => {
+    overlay.hidden = true;
+  });
+
+
+  if (interestModal) {
+    interestModal.hidden = true;
+  }
+
+
   if (constellationStars.length > 0) {
     selectInterest(
       constellationStars[0]
