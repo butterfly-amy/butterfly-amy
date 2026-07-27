@@ -3824,6 +3824,48 @@ body.favorites-lightbox-open {
     border-radius: 50%;
   }
 
+  .world-card{
+    position: relative;
+    overflow: hidden;
+}
+
+.world-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background-size:cover;
+    background-position:center;
+    opacity:.18;
+
+    transition:.4s ease;
+}
+
+.world-card:hover::before{
+    opacity:.30;
+    transform:scale(1.05);
+}
+
+.world-card-content{
+    position:relative;
+    z-index:2;
+}
+.characters-card::before{
+    background-image:url("cover/Screenshot 2026-07-27 164443.png");
+}
+
+.games-card::before{
+    background-image:url("cover/𓏴𓏴 𓊆ྀི♥︎ྀི𓊇 𓏴𓏴.jpg");
+}
+
+.anime-card::before{
+    background-image:url("cover/download (27).jpg");
+}
+
+.manga-card::before{
+    background-image:url("cover/Screenshot 2026-07-27 164405.png");
+}
+
   .favorites-lightbox-previous { left: calc(50% - 62px); }
   .favorites-lightbox-next { right: calc(50% - 62px); }
 }
