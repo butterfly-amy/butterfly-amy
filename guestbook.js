@@ -85,7 +85,7 @@ function escapeHTML(value = "") {
   return div.innerHTML;
 }
 
-function formatDate(timestamp) {
+function formatDate(timestamp) { 
   if (!timestamp?.toDate) {
     return "Just now";
   }
