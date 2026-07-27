@@ -51,7 +51,10 @@ googleProvider.setCustomParameters({
 const OWNER_UID = "OrGWes13tkXHOH09oIPhvONskyK2";
 
 function isOwnerUser(user) {
-  return Boolean(user && user.uid === OWNER_UID);
+  return Boolean(
+    user &&
+    user.uid === OWNER_UID
+  );
 }
 
 
@@ -59,12 +62,23 @@ function isOwnerUser(user) {
    HTML ELEMENTS
 ===================================================== */
 
-const form = document.querySelector("#guestbookForm");
-const nameInput = document.querySelector("#guestbookName");
-const messageInput = document.querySelector("#guestbookMessage");
-const statusMessage = document.querySelector("#guestbookStatus");
-const commentsContainer = document.querySelector("#guestbookComments");
-const submitButton = document.querySelector("#guestbookSubmit");
+const form =
+  document.querySelector("#guestbookForm");
+
+const nameInput =
+  document.querySelector("#guestbookName");
+
+const messageInput =
+  document.querySelector("#guestbookMessage");
+
+const statusMessage =
+  document.querySelector("#guestbookStatus");
+
+const commentsContainer =
+  document.querySelector("#guestbookComments");
+
+const submitButton =
+  document.querySelector("#guestbookSubmit");
 
 const ownerLoginButton =
   document.querySelector("#ownerLoginButton");
@@ -85,7 +99,7 @@ function escapeHTML(value = "") {
   return div.innerHTML;
 }
 
-function formatDate(timestamp) { 
+function formatDate(timestamp) {
   if (!timestamp?.toDate) {
     return "Just now";
   }
@@ -232,7 +246,8 @@ function renderComments(snapshot) {
           </div>
 
           <p>
-            ${escapeHTML(comment.message || "").replace(/\n/g, "<br>")}
+            ${escapeHTML(comment.message || "")
+              .replace(/\n/g, "<br>")}
           </p>
 
         </article>
@@ -316,14 +331,19 @@ form?.addEventListener(
     setStatus("");
 
     try {
-      const currentUser = auth.currentUser;
+      const currentUser =
+        auth.currentUser;
 
-      const authorUid = isOwnerUser(currentUser)
-        ? currentUser.uid
-        : null;
+      const authorUid =
+        isOwnerUser(currentUser)
+          ? currentUser.uid
+          : null;
 
       await addDoc(
-        collection(db, "guestbookMessages"),
+        collection(
+          db,
+          "guestbookMessages"
+        ),
 
         {
           name,
@@ -399,13 +419,29 @@ onAuthStateChanged(
   auth,
 
   (user) => {
-    if (!ownerLoginButton || !ownerLoginStatus) {
+    console.log(
+      "CURRENT LOGGED-IN UID:",
+      user?.uid
+    );
+
+    console.log(
+      "EXPECTED OWNER UID:",
+      OWNER_UID
+    );
+
+    if (
+      !ownerLoginButton ||
+      !ownerLoginStatus
+    ) {
       return;
     }
 
     if (isOwnerUser(user)) {
       ownerLoginStatus.textContent =
-        `Owner logged in as ${user.displayName || user.email}`;
+        `Owner logged in as ${
+          user.displayName ||
+          user.email
+        }`;
 
       ownerLoginButton.textContent =
         "Log out";
