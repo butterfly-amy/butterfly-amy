@@ -947,27 +947,108 @@
 
       </div>
 
-      <div class="guestbook-card">
-    
-      <div
-        id="cusdis_thread"
-        data-host="https://cusdis.com"
-        data-app-id="cf615651-6e32-4b6d-bf71-302ad9b229c9"
-        data-page-id="guestbook"
-        data-page-url="https://butterfly-amy.github.io/butterfly-amy/"
-        data-page-title="Amy's Website Guestbook"
-        data-theme="dark"
-      ></div>
-    
-      <script
-        async
-        defer
-        src="https://cusdis.com/js/cusdis.es.js">
-      </script>
-    
-    </div>
 
-      
+      <div class="guestbook-layout">
+
+        <form
+          class="guestbook-form"
+          id="guestbookForm"
+        >
+
+          <div class="guestbook-form-heading">
+
+            <p class="small-label">
+              Sign the guestbook
+            </p>
+
+            <h3>
+              Leave a little message ✦
+            </h3>
+
+          </div>
+
+
+          <label for="guestbookName">
+            Nickname
+          </label>
+
+          <input
+            id="guestbookName"
+            name="name"
+            type="text"
+            maxlength="30"
+            autocomplete="nickname"
+            placeholder="Your nickname"
+            required
+          >
+
+
+          <label for="guestbookMessage">
+            Message
+          </label>
+
+          <textarea
+            id="guestbookMessage"
+            name="message"
+            maxlength="500"
+            rows="6"
+            placeholder="Write something nice..."
+            required
+          ></textarea>
+
+
+          <div class="guestbook-form-footer">
+
+            <p
+              class="guestbook-status"
+              id="guestbookStatus"
+              aria-live="polite"
+            ></p>
+
+            <button
+              class="primary-button guestbook-submit"
+              id="guestbookSubmit"
+              type="submit"
+            >
+              Leave a message
+            </button>
+
+          </div>
+
+        </form>
+
+
+        <div class="guestbook-messages-panel">
+
+          <div class="guestbook-messages-heading">
+
+            <p class="small-label">
+              Messages
+            </p>
+
+            <h3>
+              Notes from visitors
+            </h3>
+
+          </div>
+
+
+          <div
+            class="guestbook-comments"
+            id="guestbookComments"
+            aria-live="polite"
+          >
+
+            <div class="guestbook-loading">
+              <span aria-hidden="true">✦</span>
+              <p>Loading messages...</p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
 
     </section>
 
@@ -2101,6 +2182,7 @@
 
 
   <script src="app.js"></script>
+  <script type="module" src="guestbook.js"></script>
 
 </body>
 
