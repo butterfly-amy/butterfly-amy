@@ -1,4 +1,13 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
 import {
   getFirestore,
   collection,
@@ -19,7 +28,15 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
+const auth = getAuth(app);
+
+const googleProvider = new GoogleAuthProvider();
+
+googleProvider.setCustomParameters({
+  prompt: "select_account"
+});
 
 const form = document.querySelector("#guestbookForm");
 const nameInput = document.querySelector("#guestbookName");
@@ -28,14 +45,24 @@ const statusMessage = document.querySelector("#guestbookStatus");
 const commentsContainer = document.querySelector("#guestbookComments");
 const submitButton = document.querySelector("#guestbookSubmit");
 
-function escapeHTML(value) {
+const ownerLoginButton =
+  document.querySelector("#ownerLoginButton");
+
+const ownerLoginStatus =
+  document.querySelector("#ownerLoginStatus");
+
+function escapeHTML(value = "") {
   const div = document.createElement("div");
-  div.textContent = value;
+
+  div.textContent = String(value);
+
   return div.innerHTML;
 }
 
 function formatDate(timestamp) {
-  if (!timestamp?.toDate) return "Just now";
+  if (!timestamp?.toDate) {
+    return "Just now";
+  }
 
   return new Intl.DateTimeFormat("en", {
     dateStyle: "medium",
@@ -43,54 +70,112 @@ function formatDate(timestamp) {
   }).format(timestamp.toDate());
 }
 
+function setStatus(message, type = "") {
+  if (!statusMessage) {
+    return;
+  }
+
+  statusMessage.textContent = message;
+
+  if (type) {
+    statusMessage.dataset.type = type;
+  } else {
+    delete statusMessage.dataset.type;
+  }
+}
+
+function setSubmitLoading(isLoading) {
+  if (!submitButton) {
+    return;
+  }
+
+  submitButton.disabled = isLoading;
+
+  submitButton.textContent = isLoading
+    ? "Sending..."
+    : "Leave a message";
+}
+
 function renderEmptyState() {
+  if (!commentsContainer) {
+    return;
+  }
+
   commentsContainer.innerHTML = `
     <div class="guestbook-empty">
-      <span>✦</span>
-      <p>Be the first person to leave a message! 🦋</p>
+      <span aria-hidden="true">✦</span>
+
+      <p>
+        Be the first person to leave a message! 🦋
+      </p>
     </div>
   `;
 }
 
-function renderComments(snapshot) {
-  if (snapshot.empty) {
-    renderEmptyState();
+function renderErrorState() {
+  if (!commentsContainer) {
     return;
   }
 
-  commentsContainer.innerHTML = "";
+  commentsContainer.innerHTML = `
+    <p class="guestbook-error">
+      The messages could not be loaded right now.
+    </p>
+  `;
+}
 
-  snapshot.forEach((doc) => {
-    const comment = doc.data();
+function renderComments(snapshot) {
+  if (!commentsContainer) {
+    return;
+  }
 
-    commentsContainer.innerHTML += `
-      <article class="guestbook-comment">
+  if (snapshot.empty) {
+    renderEmptyState();
 
-        <div class="guestbook-comment-header">
+    return;
+  }
 
-          <div class="guestbook-avatar">
-            ✦
+  commentsContainer.innerHTML = snapshot.docs
+    .map((documentSnapshot) => {
+      const comment = documentSnapshot.data();
+
+      return `
+        <article
+          class="guestbook-comment"
+          data-comment-id="${escapeHTML(documentSnapshot.id)}"
+        >
+
+          <div class="guestbook-comment-header">
+
+            <div
+              class="guestbook-avatar"
+              aria-hidden="true"
+            >
+              ✦
+            </div>
+
+            <div class="guestbook-comment-meta">
+
+              <h3>
+                ${escapeHTML(comment.name || "Guest")}
+              </h3>
+
+              <time>
+                ${formatDate(comment.createdAt)}
+              </time>
+
+            </div>
+
           </div>
 
-          <div>
+          <p>
+            ${escapeHTML(comment.message || "").replace(/\n/g, "<br>")}
+          </p>
 
-            <h3>${escapeHTML(comment.name)}</h3>
-
-            <time>
-              ${formatDate(comment.createdAt)}
-            </time>
-
-          </div>
-
-        </div>
-
-        <p>
-          ${escapeHTML(comment.message).replace(/\n/g, "<br>")}
-        </p>
-
-      </article>
-    `;
-  });
+        </article>
+      `;
+    })
+    .join("");
 }
 
 const commentsQuery = query(
@@ -100,59 +185,166 @@ const commentsQuery = query(
 
 onSnapshot(
   commentsQuery,
-  renderComments,
-  (error) => {
-    console.error(error);
 
-    commentsContainer.innerHTML = `
-      <p class="guestbook-error">
-        Couldn't load comments.
-      </p>
-    `;
+  (snapshot) => {
+    renderComments(snapshot);
+  },
+
+  (error) => {
+    console.error(
+      "Could not load guestbook messages:",
+      error
+    );
+
+    renderErrorState();
   }
 );
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
+form?.addEventListener(
+  "submit",
 
-  const name = nameInput.value.trim();
-  const message = messageInput.value.trim();
+  async (event) => {
+    event.preventDefault();
 
-  if (!name || !message) {
-    statusMessage.textContent =
-      "Please enter a nickname and a message.";
-    return;
+    const name =
+      nameInput?.value.trim() || "";
+
+    const message =
+      messageInput?.value.trim() || "";
+
+    if (!name || !message) {
+      setStatus(
+        "Please enter both a nickname and a message.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (name.length > 30) {
+      setStatus(
+        "Your nickname can contain a maximum of 30 characters.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (message.length > 500) {
+      setStatus(
+        "Your message can contain a maximum of 500 characters.",
+        "error"
+      );
+
+      return;
+    }
+
+    setSubmitLoading(true);
+
+    setStatus("");
+
+    try {
+      await addDoc(
+        collection(db, "guestbookMessages"),
+
+        {
+          name,
+          message,
+          createdAt: serverTimestamp()
+        }
+      );
+
+      form.reset();
+
+      setStatus(
+        "Message sent! ✨",
+        "success"
+      );
+    } catch (error) {
+      console.error(
+        "Could not post guestbook message:",
+        error
+      );
+
+      setStatus(
+        "Something went wrong. Please try again.",
+        "error"
+      );
+    } finally {
+      setSubmitLoading(false);
+    }
   }
+);
 
-  submitButton.disabled = true;
-  submitButton.textContent = "Sending...";
+ownerLoginButton?.addEventListener(
+  "click",
 
-  try {
+  async () => {
+    try {
+      if (auth.currentUser) {
+        await signOut(auth);
 
-    await addDoc(
-      collection(db, "guestbookMessages"),
-      {
-        name,
-        message,
-        createdAt: serverTimestamp()
+        return;
       }
-    );
 
-    form.reset();
+      await signInWithPopup(
+        auth,
+        googleProvider
+      );
+    } catch (error) {
+      console.error(
+        "Owner login failed:",
+        error
+      );
 
-    statusMessage.textContent =
-      "Message sent! ✨";
-
-  } catch (error) {
-
-    console.error(error);
-
-    statusMessage.textContent =
-      "Something went wrong.";
-
+      if (ownerLoginStatus) {
+        ownerLoginStatus.textContent =
+          "Login failed. Please try again.";
+      }
+    }
   }
+);
 
-  submitButton.disabled = false;
-  submitButton.textContent =
-    "Leave a message";
-});
+onAuthStateChanged(
+  auth,
+
+  (user) => {
+    if (!ownerLoginButton || !ownerLoginStatus) {
+      if (user) {
+        console.log(
+          "OWNER UID:",
+          user.uid
+        );
+      }
+
+      return;
+    }
+
+    if (user) {
+      ownerLoginStatus.textContent =
+        `Logged in as ${user.displayName || user.email}`;
+
+      ownerLoginButton.textContent =
+        "Log out";
+
+      ownerLoginButton.classList.add(
+        "is-logged-in"
+      );
+
+      console.log(
+        "OWNER UID:",
+        user.uid
+      );
+    } else {
+      ownerLoginStatus.textContent =
+        "Not logged in";
+
+      ownerLoginButton.textContent =
+        "Owner login";
+
+      ownerLoginButton.classList.remove(
+        "is-logged-in"
+      );
+    }
+  }
+);
