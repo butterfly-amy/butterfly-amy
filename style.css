@@ -3905,10 +3905,179 @@ body.favorites-lightbox-open {
     right:
       calc(50% - 62px);
   }
+  
+}
+/* =====================================================
+   FIREBASE GUESTBOOK
+===================================================== */
 
-  .guestbook-card {
-    padding: 18px;
+.guestbook-layout{
+    display:grid;
+    grid-template-columns:420px 1fr;
+    gap:40px;
+    margin-top:50px;
+    align-items:start;
+}
 
-    border-radius: 22px;
-  }
+.guestbook-form,
+.guestbook-messages-panel{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:24px;
+    backdrop-filter:blur(18px);
+    padding:30px;
+    box-shadow:0 0 40px rgba(0,0,0,.35);
+}
+
+.guestbook-form-heading h3,
+.guestbook-messages-heading h3{
+    margin-top:8px;
+    margin-bottom:25px;
+}
+
+.guestbook-form label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:600;
+    color:var(--text);
+}
+
+.guestbook-form input,
+.guestbook-form textarea{
+    width:100%;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:14px;
+    color:white;
+    padding:14px 16px;
+    font-size:15px;
+    margin-bottom:18px;
+    transition:.25s;
+}
+
+.guestbook-form textarea{
+    resize:vertical;
+    min-height:160px;
+}
+
+.guestbook-form input:focus,
+.guestbook-form textarea:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 18px rgba(255,170,80,.25);
+}
+
+.guestbook-form-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.guestbook-submit{
+    cursor:pointer;
+}
+
+.guestbook-status{
+    color:#ffd69d;
+    font-size:.9rem;
+}
+
+.guestbook-comments{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    max-height:700px;
+    overflow-y:auto;
+    padding-right:8px;
+}
+
+.guestbook-comments::-webkit-scrollbar{
+    width:8px;
+}
+
+.guestbook-comments::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,.12);
+    border-radius:999px;
+}
+
+.guestbook-comment{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;
+    padding:22px;
+    transition:.25s;
+}
+
+.guestbook-comment:hover{
+    transform:translateY(-3px);
+    border-color:rgba(255,170,80,.4);
+    box-shadow:0 10px 30px rgba(255,170,80,.12);
+}
+
+.guestbook-comment-header{
+    display:flex;
+    gap:15px;
+    align-items:center;
+    margin-bottom:16px;
+}
+
+.guestbook-avatar{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#ffcf75,#ff8f5a);
+    color:white;
+    font-size:22px;
+    flex-shrink:0;
+}
+
+.guestbook-comment h3{
+    margin:0;
+    font-size:1.05rem;
+}
+
+.guestbook-comment time{
+    display:block;
+    opacity:.65;
+    font-size:.8rem;
+    margin-top:3px;
+}
+
+.guestbook-comment p{
+    margin:0;
+    line-height:1.8;
+    white-space:pre-wrap;
+}
+
+.guestbook-empty,
+.guestbook-loading,
+.guestbook-error{
+    text-align:center;
+    padding:60px 20px;
+    opacity:.75;
+}
+
+.guestbook-empty span,
+.guestbook-loading span{
+    display:block;
+    font-size:2rem;
+    margin-bottom:15px;
+    color:#ffd27d;
+}
+
+@media(max-width:900px){
+
+    .guestbook-layout{
+        grid-template-columns:1fr;
+    }
+
+    .guestbook-comments{
+        max-height:none;
+    }
+
 }
