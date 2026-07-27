@@ -18,6 +18,11 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
+
+/* =====================================================
+   FIREBASE
+===================================================== */
+
 const firebaseConfig = {
   apiKey: "AIzaSyCO1u1_hGSSrRZg1EVlbmXNHzAgdepbHm4",
   authDomain: "butterfly-amy.firebaseapp.com",
@@ -38,6 +43,22 @@ googleProvider.setCustomParameters({
   prompt: "select_account"
 });
 
+
+/* =====================================================
+   OWNER
+===================================================== */
+
+const OWNER_UID = "OrGWes13tkXHOH09oIPhvONskyK2";
+
+function isOwnerUser(user) {
+  return Boolean(user && user.uid === OWNER_UID);
+}
+
+
+/* =====================================================
+   HTML ELEMENTS
+===================================================== */
+
 const form = document.querySelector("#guestbookForm");
 const nameInput = document.querySelector("#guestbookName");
 const messageInput = document.querySelector("#guestbookMessage");
@@ -50,6 +71,11 @@ const ownerLoginButton =
 
 const ownerLoginStatus =
   document.querySelector("#ownerLoginStatus");
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
 
 function escapeHTML(value = "") {
   const div = document.createElement("div");
@@ -96,6 +122,11 @@ function setSubmitLoading(isLoading) {
     : "Leave a message";
 }
 
+
+/* =====================================================
+   EMPTY / ERROR STATES
+===================================================== */
+
 function renderEmptyState() {
   if (!commentsContainer) {
     return;
@@ -103,11 +134,15 @@ function renderEmptyState() {
 
   commentsContainer.innerHTML = `
     <div class="guestbook-empty">
-      <span aria-hidden="true">✦</span>
+
+      <span aria-hidden="true">
+        ✦
+      </span>
 
       <p>
         Be the first person to leave a message! 🦋
       </p>
+
     </div>
   `;
 }
@@ -124,6 +159,11 @@ function renderErrorState() {
   `;
 }
 
+
+/* =====================================================
+   RENDER COMMENTS
+===================================================== */
+
 function renderComments(snapshot) {
   if (!commentsContainer) {
     return;
@@ -131,7 +171,6 @@ function renderComments(snapshot) {
 
   if (snapshot.empty) {
     renderEmptyState();
-
     return;
   }
 
@@ -139,9 +178,27 @@ function renderComments(snapshot) {
     .map((documentSnapshot) => {
       const comment = documentSnapshot.data();
 
+      const commentIsOwner =
+        comment.authorUid === OWNER_UID;
+
+      const ownerBadge = commentIsOwner
+        ? `
+          <span
+            class="guestbook-op-badge"
+            title="Original poster"
+          >
+            OP
+          </span>
+        `
+        : "";
+
+      const ownerClass = commentIsOwner
+        ? " guestbook-comment-owner"
+        : "";
+
       return `
         <article
-          class="guestbook-comment"
+          class="guestbook-comment${ownerClass}"
           data-comment-id="${escapeHTML(documentSnapshot.id)}"
         >
 
@@ -151,14 +208,20 @@ function renderComments(snapshot) {
               class="guestbook-avatar"
               aria-hidden="true"
             >
-              ✦
+              ${commentIsOwner ? "✧" : "✦"}
             </div>
 
             <div class="guestbook-comment-meta">
 
-              <h3>
-                ${escapeHTML(comment.name || "Guest")}
-              </h3>
+              <div class="guestbook-name-row">
+
+                <h3>
+                  ${escapeHTML(comment.name || "Guest")}
+                </h3>
+
+                ${ownerBadge}
+
+              </div>
 
               <time>
                 ${formatDate(comment.createdAt)}
@@ -177,6 +240,11 @@ function renderComments(snapshot) {
     })
     .join("");
 }
+
+
+/* =====================================================
+   LIVE COMMENTS
+===================================================== */
 
 const commentsQuery = query(
   collection(db, "guestbookMessages"),
@@ -199,6 +267,11 @@ onSnapshot(
     renderErrorState();
   }
 );
+
+
+/* =====================================================
+   POST MESSAGE
+===================================================== */
 
 form?.addEventListener(
   "submit",
@@ -240,16 +313,22 @@ form?.addEventListener(
     }
 
     setSubmitLoading(true);
-
     setStatus("");
 
     try {
+      const currentUser = auth.currentUser;
+
+      const authorUid = isOwnerUser(currentUser)
+        ? currentUser.uid
+        : null;
+
       await addDoc(
         collection(db, "guestbookMessages"),
 
         {
           name,
           message,
+          authorUid,
           createdAt: serverTimestamp()
         }
       );
@@ -257,7 +336,9 @@ form?.addEventListener(
       form.reset();
 
       setStatus(
-        "Message sent! ✨",
+        authorUid
+          ? "Your OP message was sent! ✨"
+          : "Message sent! ✨",
         "success"
       );
     } catch (error) {
@@ -276,6 +357,11 @@ form?.addEventListener(
   }
 );
 
+
+/* =====================================================
+   OWNER LOGIN
+===================================================== */
+
 ownerLoginButton?.addEventListener(
   "click",
 
@@ -283,7 +369,6 @@ ownerLoginButton?.addEventListener(
     try {
       if (auth.currentUser) {
         await signOut(auth);
-
         return;
       }
 
@@ -305,24 +390,22 @@ ownerLoginButton?.addEventListener(
   }
 );
 
+
+/* =====================================================
+   LOGIN STATE
+===================================================== */
+
 onAuthStateChanged(
   auth,
 
   (user) => {
     if (!ownerLoginButton || !ownerLoginStatus) {
-      if (user) {
-        console.log(
-          "OWNER UID:",
-          user.uid
-        );
-      }
-
       return;
     }
 
-    if (user) {
+    if (isOwnerUser(user)) {
       ownerLoginStatus.textContent =
-        `Logged in as ${user.displayName || user.email}`;
+        `Owner logged in as ${user.displayName || user.email}`;
 
       ownerLoginButton.textContent =
         "Log out";
@@ -331,20 +414,43 @@ onAuthStateChanged(
         "is-logged-in"
       );
 
-      console.log(
-        "OWNER UID:",
-        user.uid
+      document.body.classList.add(
+        "guestbook-owner-logged-in"
       );
-    } else {
+
+      return;
+    }
+
+    if (user) {
       ownerLoginStatus.textContent =
-        "Not logged in";
+        "This Google account is not the owner.";
 
       ownerLoginButton.textContent =
-        "Owner login";
+        "Log out";
 
       ownerLoginButton.classList.remove(
         "is-logged-in"
       );
+
+      document.body.classList.remove(
+        "guestbook-owner-logged-in"
+      );
+
+      return;
     }
+
+    ownerLoginStatus.textContent =
+      "Not logged in";
+
+    ownerLoginButton.textContent =
+      "Owner login";
+
+    ownerLoginButton.classList.remove(
+      "is-logged-in"
+    );
+
+    document.body.classList.remove(
+      "guestbook-owner-logged-in"
+    );
   }
 );
