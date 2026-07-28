@@ -45,19 +45,16 @@ googleProvider.setCustomParameters({
 
 
 /* =====================================================
-   OWNER INFORMATION
+   OWNER
 ===================================================== */
 
-const OWNER_UID = "OrGWes13tkXHOH09oIPhvONskyK2";
+const OWNER_UID =
+  "OrGWes13tkXHOH09oIPhvONskyK2";
 
 const OWNER_EMAIL =
   "amina.mukhtarova.2008@gmail.com";
 
 
-/*
-  Removes spaces and invisible characters that might
-  accidentally appear when a value is copied.
-*/
 function cleanValue(value) {
   return String(value || "")
     .replace(/[\u200B-\u200D\uFEFF]/g, "")
@@ -70,23 +67,30 @@ function isOwnerUser(user) {
     return false;
   }
 
-  const currentUid =
-    cleanValue(user.uid);
-
-  const expectedUid =
+  const uidMatches =
+    cleanValue(user.uid) ===
     cleanValue(OWNER_UID);
 
-  const currentEmail =
-    cleanValue(user.email).toLowerCase();
-
-  const expectedEmail =
+  const emailMatches =
+    cleanValue(user.email).toLowerCase() ===
     cleanValue(OWNER_EMAIL).toLowerCase();
 
+  return uidMatches || emailMatches;
+}
+
+
+function isOwnerContent(data) {
+  if (!data) {
+    return false;
+  }
+
   const uidMatches =
-    currentUid === expectedUid;
+    cleanValue(data.authorUid) ===
+    cleanValue(OWNER_UID);
 
   const emailMatches =
-    currentEmail === expectedEmail;
+    cleanValue(data.authorEmail).toLowerCase() ===
+    cleanValue(OWNER_EMAIL).toLowerCase();
 
   return uidMatches || emailMatches;
 }
@@ -122,13 +126,31 @@ const ownerLoginStatus =
 
 
 /* =====================================================
+   REPLY LISTENERS
+===================================================== */
+
+const replyUnsubscribers = new Map();
+
+
+function clearReplyListeners() {
+  replyUnsubscribers.forEach((unsubscribe) => {
+    unsubscribe();
+  });
+
+  replyUnsubscribers.clear();
+}
+
+
+/* =====================================================
    HELPERS
 ===================================================== */
 
 function escapeHTML(value = "") {
-  const div = document.createElement("div");
+  const div =
+    document.createElement("div");
 
-  div.textContent = String(value);
+  div.textContent =
+    String(value);
 
   return div.innerHTML;
 }
@@ -151,10 +173,12 @@ function setStatus(message, type = "") {
     return;
   }
 
-  statusMessage.textContent = message;
+  statusMessage.textContent =
+    message;
 
   if (type) {
-    statusMessage.dataset.type = type;
+    statusMessage.dataset.type =
+      type;
   } else {
     delete statusMessage.dataset.type;
   }
@@ -166,11 +190,25 @@ function setSubmitLoading(isLoading) {
     return;
   }
 
-  submitButton.disabled = isLoading;
+  submitButton.disabled =
+    isLoading;
 
-  submitButton.textContent = isLoading
-    ? "Sending..."
-    : "Leave a message";
+  submitButton.textContent =
+    isLoading
+      ? "Sending..."
+      : "Leave a message";
+}
+
+
+function createOwnerBadge() {
+  return `
+    <span
+      class="guestbook-op-badge"
+      title="Website owner"
+    >
+      ✦ OP
+    </span>
+  `;
 }
 
 
@@ -221,99 +259,263 @@ function renderComments(snapshot) {
     return;
   }
 
+  clearReplyListeners();
+
   if (snapshot.empty) {
     renderEmptyState();
     return;
   }
 
-  commentsContainer.innerHTML = snapshot.docs
-    .map((documentSnapshot) => {
-      const comment =
-        documentSnapshot.data();
+  commentsContainer.innerHTML =
+    snapshot.docs
+      .map((documentSnapshot) => {
+        const comment =
+          documentSnapshot.data();
 
-      const commentAuthorUid =
-        cleanValue(comment.authorUid);
+        const commentId =
+          documentSnapshot.id;
 
-      const commentAuthorEmail =
-        cleanValue(comment.authorEmail)
-          .toLowerCase();
+        const commentIsOwner =
+          isOwnerContent(comment);
 
-      const commentIsOwner =
-        commentAuthorUid === cleanValue(OWNER_UID) ||
-        commentAuthorEmail ===
-          cleanValue(OWNER_EMAIL).toLowerCase();
+        const ownerBadge =
+          commentIsOwner
+            ? createOwnerBadge()
+            : "";
 
-      const ownerBadge = commentIsOwner
-        ? `
-          <span
-            class="guestbook-op-badge"
-            title="Website owner"
+        const ownerClass =
+          commentIsOwner
+            ? " guestbook-comment-owner"
+            : "";
+
+        return `
+          <article
+            class="guestbook-comment${ownerClass}"
+            data-comment-id="${escapeHTML(commentId)}"
           >
-            ✦ OP
-          </span>
-        `
-        : "";
 
-      const ownerClass = commentIsOwner
-        ? " guestbook-comment-owner"
-        : "";
+            <div class="guestbook-comment-header">
 
-      const avatarSymbol = commentIsOwner
-        ? "✧"
-        : "✦";
+              <div
+                class="guestbook-avatar"
+                aria-hidden="true"
+              >
+                ${commentIsOwner ? "✧" : "✦"}
+              </div>
 
-      return `
-        <article
-          class="guestbook-comment${ownerClass}"
-          data-comment-id="${escapeHTML(
-            documentSnapshot.id
-          )}"
-        >
 
-          <div class="guestbook-comment-header">
+              <div class="guestbook-comment-meta">
 
-            <div
-              class="guestbook-avatar"
-              aria-hidden="true"
-            >
-              ${avatarSymbol}
+                <div class="guestbook-name-row">
+
+                  <h3>
+                    ${escapeHTML(
+                      comment.name || "Guest"
+                    )}
+                  </h3>
+
+                  ${ownerBadge}
+
+                </div>
+
+
+                <time>
+                  ${formatDate(comment.createdAt)}
+                </time>
+
+              </div>
+
             </div>
 
 
-            <div class="guestbook-comment-meta">
+            <p class="guestbook-comment-message">
+              ${escapeHTML(
+                comment.message || ""
+              ).replace(/\n/g, "<br>")}
+            </p>
 
-              <div class="guestbook-name-row">
 
-                <h3>
-                  ${escapeHTML(
-                    comment.name || "Guest"
-                  )}
-                </h3>
+            <div class="guestbook-comment-actions">
 
-                ${ownerBadge}
+              <button
+                class="guestbook-reply-button"
+                type="button"
+                data-reply-to="${escapeHTML(commentId)}"
+              >
+                💬 Reply
+              </button>
+
+            </div>
+
+
+            <div
+              class="guestbook-reply-form-container"
+              id="replyFormContainer-${escapeHTML(commentId)}"
+              hidden
+            >
+            </div>
+
+
+            <div
+              class="guestbook-replies"
+              id="replies-${escapeHTML(commentId)}"
+            >
+            </div>
+
+          </article>
+        `;
+      })
+      .join("");
+
+  snapshot.docs.forEach((documentSnapshot) => {
+    subscribeToReplies(
+      documentSnapshot.id
+    );
+  });
+}
+
+
+/* =====================================================
+   RENDER REPLIES
+===================================================== */
+
+function renderReplies(
+  commentId,
+  snapshot
+) {
+  const repliesContainer =
+    document.getElementById(
+      `replies-${commentId}`
+    );
+
+  if (!repliesContainer) {
+    return;
+  }
+
+  if (snapshot.empty) {
+    repliesContainer.innerHTML = "";
+    return;
+  }
+
+  repliesContainer.innerHTML =
+    snapshot.docs
+      .map((replyDocument) => {
+        const reply =
+          replyDocument.data();
+
+        const replyIsOwner =
+          isOwnerContent(reply);
+
+        const ownerBadge =
+          replyIsOwner
+            ? createOwnerBadge()
+            : "";
+
+        const ownerClass =
+          replyIsOwner
+            ? " guestbook-reply-owner"
+            : "";
+
+        return `
+          <article
+            class="guestbook-reply${ownerClass}"
+            data-reply-id="${escapeHTML(replyDocument.id)}"
+          >
+
+            <div class="guestbook-reply-line">
+              ↳
+            </div>
+
+
+            <div class="guestbook-reply-content">
+
+              <div class="guestbook-reply-header">
+
+                <div
+                  class="guestbook-reply-avatar"
+                  aria-hidden="true"
+                >
+                  ${replyIsOwner ? "✧" : "✦"}
+                </div>
+
+
+                <div>
+
+                  <div class="guestbook-name-row">
+
+                    <h4>
+                      ${escapeHTML(
+                        reply.name || "Guest"
+                      )}
+                    </h4>
+
+                    ${ownerBadge}
+
+                  </div>
+
+
+                  <time>
+                    ${formatDate(reply.createdAt)}
+                  </time>
+
+                </div>
 
               </div>
 
 
-              <time>
-                ${formatDate(comment.createdAt)}
-              </time>
+              <p>
+                ${escapeHTML(
+                  reply.message || ""
+                ).replace(/\n/g, "<br>")}
+              </p>
 
             </div>
 
-          </div>
+          </article>
+        `;
+      })
+      .join("");
+}
 
 
-          <p>
-            ${escapeHTML(
-              comment.message || ""
-            ).replace(/\n/g, "<br>")}
-          </p>
+/* =====================================================
+   LIVE REPLIES
+===================================================== */
 
-        </article>
-      `;
-    })
-    .join("");
+function subscribeToReplies(commentId) {
+  const repliesQuery = query(
+    collection(
+      db,
+      "guestbookMessages",
+      commentId,
+      "replies"
+    ),
+    orderBy("createdAt", "asc")
+  );
+
+  const unsubscribe =
+    onSnapshot(
+      repliesQuery,
+
+      (snapshot) => {
+        renderReplies(
+          commentId,
+          snapshot
+        );
+      },
+
+      (error) => {
+        console.error(
+          `Could not load replies for ${commentId}:`,
+          error
+        );
+      }
+    );
+
+  replyUnsubscribers.set(
+    commentId,
+    unsubscribe
+  );
 }
 
 
@@ -346,7 +548,7 @@ onSnapshot(
 
 
 /* =====================================================
-   POST MESSAGE
+   POST MAIN MESSAGE
 ===================================================== */
 
 form?.addEventListener(
@@ -398,15 +600,6 @@ form?.addEventListener(
       const ownerIsPosting =
         isOwnerUser(currentUser);
 
-      const authorUid = ownerIsPosting
-        ? cleanValue(currentUser.uid)
-        : null;
-
-      const authorEmail = ownerIsPosting
-        ? cleanValue(currentUser.email)
-            .toLowerCase()
-        : null;
-
       await addDoc(
         collection(
           db,
@@ -416,24 +609,33 @@ form?.addEventListener(
         {
           name,
           message,
-          authorUid,
-          authorEmail,
-          isOwner: ownerIsPosting,
-          createdAt: serverTimestamp()
+
+          authorUid:
+            ownerIsPosting
+              ? currentUser.uid
+              : null,
+
+          authorEmail:
+            ownerIsPosting
+              ? currentUser.email
+              : null,
+
+          isOwner:
+            ownerIsPosting,
+
+          createdAt:
+            serverTimestamp()
         }
       );
 
       form.reset();
 
-      /*
-        Put Amy back into the nickname input
-        after an owner message is posted.
-      */
       if (
         ownerIsPosting &&
         nameInput
       ) {
-        nameInput.value = "Amy";
+        nameInput.value =
+          "Amy";
       }
 
       setStatus(
@@ -460,7 +662,288 @@ form?.addEventListener(
 
 
 /* =====================================================
-   OWNER LOGIN BUTTON
+   OPEN AND CLOSE REPLY FORM
+===================================================== */
+
+commentsContainer?.addEventListener(
+  "click",
+
+  (event) => {
+    const replyButton =
+      event.target.closest(
+        ".guestbook-reply-button"
+      );
+
+    if (replyButton) {
+      const commentId =
+        replyButton.dataset.replyTo;
+
+      openReplyForm(commentId);
+
+      return;
+    }
+
+
+    const cancelButton =
+      event.target.closest(
+        ".guestbook-reply-cancel"
+      );
+
+    if (cancelButton) {
+      const commentId =
+        cancelButton.dataset.cancelReply;
+
+      closeReplyForm(commentId);
+    }
+  }
+);
+
+
+function openReplyForm(commentId) {
+  const container =
+    document.getElementById(
+      `replyFormContainer-${commentId}`
+    );
+
+  if (!container) {
+    return;
+  }
+
+  const ownerIsLoggedIn =
+    isOwnerUser(auth.currentUser);
+
+  const defaultName =
+    ownerIsLoggedIn
+      ? "Amy"
+      : "";
+
+  container.innerHTML = `
+    <form
+      class="guestbook-reply-form"
+      data-comment-id="${escapeHTML(commentId)}"
+    >
+
+      <p class="small-label">
+        Write a reply
+      </p>
+
+
+      <input
+        class="guestbook-reply-name"
+        type="text"
+        maxlength="30"
+        placeholder="Your nickname"
+        value="${escapeHTML(defaultName)}"
+        required
+      >
+
+
+      <textarea
+        class="guestbook-reply-message"
+        maxlength="500"
+        rows="4"
+        placeholder="Write your reply..."
+        required
+      ></textarea>
+
+
+      <p
+        class="guestbook-reply-status"
+        aria-live="polite"
+      ></p>
+
+
+      <div class="guestbook-reply-form-actions">
+
+        <button
+          class="guestbook-reply-cancel"
+          type="button"
+          data-cancel-reply="${escapeHTML(commentId)}"
+        >
+          Cancel
+        </button>
+
+
+        <button
+          class="primary-button guestbook-reply-submit"
+          type="submit"
+        >
+          Send reply
+        </button>
+
+      </div>
+
+    </form>
+  `;
+
+  container.hidden = false;
+
+  const replyTextarea =
+    container.querySelector(
+      ".guestbook-reply-message"
+    );
+
+  replyTextarea?.focus();
+}
+
+
+function closeReplyForm(commentId) {
+  const container =
+    document.getElementById(
+      `replyFormContainer-${commentId}`
+    );
+
+  if (!container) {
+    return;
+  }
+
+  container.hidden = true;
+  container.innerHTML = "";
+}
+
+
+/* =====================================================
+   POST REPLY
+===================================================== */
+
+commentsContainer?.addEventListener(
+  "submit",
+
+  async (event) => {
+    const replyForm =
+      event.target.closest(
+        ".guestbook-reply-form"
+      );
+
+    if (!replyForm) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const commentId =
+      replyForm.dataset.commentId;
+
+    const replyNameInput =
+      replyForm.querySelector(
+        ".guestbook-reply-name"
+      );
+
+    const replyMessageInput =
+      replyForm.querySelector(
+        ".guestbook-reply-message"
+      );
+
+    const replyStatus =
+      replyForm.querySelector(
+        ".guestbook-reply-status"
+      );
+
+    const replySubmitButton =
+      replyForm.querySelector(
+        ".guestbook-reply-submit"
+      );
+
+    const name =
+      replyNameInput?.value.trim() || "";
+
+    const message =
+      replyMessageInput?.value.trim() || "";
+
+    if (!name || !message) {
+      if (replyStatus) {
+        replyStatus.textContent =
+          "Please enter a nickname and reply.";
+      }
+
+      return;
+    }
+
+    if (name.length > 30) {
+      if (replyStatus) {
+        replyStatus.textContent =
+          "Your nickname is too long.";
+      }
+
+      return;
+    }
+
+    if (message.length > 500) {
+      if (replyStatus) {
+        replyStatus.textContent =
+          "Your reply is too long.";
+      }
+
+      return;
+    }
+
+    if (replySubmitButton) {
+      replySubmitButton.disabled = true;
+      replySubmitButton.textContent =
+        "Sending...";
+    }
+
+    try {
+      const currentUser =
+        auth.currentUser;
+
+      const ownerIsReplying =
+        isOwnerUser(currentUser);
+
+      await addDoc(
+        collection(
+          db,
+          "guestbookMessages",
+          commentId,
+          "replies"
+        ),
+
+        {
+          name,
+          message,
+
+          authorUid:
+            ownerIsReplying
+              ? currentUser.uid
+              : null,
+
+          authorEmail:
+            ownerIsReplying
+              ? currentUser.email
+              : null,
+
+          isOwner:
+            ownerIsReplying,
+
+          createdAt:
+            serverTimestamp()
+        }
+      );
+
+      closeReplyForm(commentId);
+    } catch (error) {
+      console.error(
+        "Could not post reply:",
+        error
+      );
+
+      if (replyStatus) {
+        replyStatus.textContent =
+          "Something went wrong. Please try again.";
+      }
+
+      if (replySubmitButton) {
+        replySubmitButton.disabled = false;
+        replySubmitButton.textContent =
+          "Send reply";
+      }
+    }
+  }
+);
+
+
+/* =====================================================
+   OWNER LOGIN
 ===================================================== */
 
 ownerLoginButton?.addEventListener(
@@ -503,26 +986,6 @@ onAuthStateChanged(
     const ownerIsLoggedIn =
       isOwnerUser(user);
 
-    console.log(
-      "CURRENT UID:",
-      JSON.stringify(user?.uid || null)
-    );
-
-    console.log(
-      "EXPECTED OWNER UID:",
-      JSON.stringify(OWNER_UID)
-    );
-
-    console.log(
-      "CURRENT EMAIL:",
-      user?.email || null
-    );
-
-    console.log(
-      "IS OWNER:",
-      ownerIsLoggedIn
-    );
-
     if (
       !ownerLoginButton ||
       !ownerLoginStatus
@@ -531,7 +994,6 @@ onAuthStateChanged(
     }
 
 
-    /* Owner is logged in */
     if (ownerIsLoggedIn) {
       ownerLoginStatus.textContent =
         `Owner logged in as ${
@@ -555,14 +1017,14 @@ onAuthStateChanged(
         nameInput &&
         !nameInput.value.trim()
       ) {
-        nameInput.value = "Amy";
+        nameInput.value =
+          "Amy";
       }
 
       return;
     }
 
 
-    /* A different Google account is logged in */
     if (user) {
       ownerLoginStatus.textContent =
         "This Google account is not the owner.";
@@ -582,7 +1044,6 @@ onAuthStateChanged(
     }
 
 
-    /* Nobody is logged in */
     ownerLoginStatus.textContent =
       "Not logged in";
 
