@@ -4851,3 +4851,10 @@ body.guestbook-reply-open {
     overflow: hidden;
   }
 }
+
+/* Hide the clock on phones */
+@media (max-width: 820px) {
+    .central-clock {
+        display: none !important;
+    }
+}
