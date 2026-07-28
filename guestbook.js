@@ -45,16 +45,50 @@ googleProvider.setCustomParameters({
 
 
 /* =====================================================
-   OWNER
+   OWNER INFORMATION
 ===================================================== */
 
 const OWNER_UID = "OrGWes13tkXHOH09oIPhvONskyK2";
 
+const OWNER_EMAIL =
+  "amina.mukhtarova.2008@gmail.com";
+
+
+/*
+  Removes spaces and invisible characters that might
+  accidentally appear when a value is copied.
+*/
+function cleanValue(value) {
+  return String(value || "")
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .trim();
+}
+
+
 function isOwnerUser(user) {
-  return Boolean(
-    user &&
-    user.uid === OWNER_UID
-  );
+  if (!user) {
+    return false;
+  }
+
+  const currentUid =
+    cleanValue(user.uid);
+
+  const expectedUid =
+    cleanValue(OWNER_UID);
+
+  const currentEmail =
+    cleanValue(user.email).toLowerCase();
+
+  const expectedEmail =
+    cleanValue(OWNER_EMAIL).toLowerCase();
+
+  const uidMatches =
+    currentUid === expectedUid;
+
+  const emailMatches =
+    currentEmail === expectedEmail;
+
+  return uidMatches || emailMatches;
 }
 
 
@@ -99,6 +133,7 @@ function escapeHTML(value = "") {
   return div.innerHTML;
 }
 
+
 function formatDate(timestamp) {
   if (!timestamp?.toDate) {
     return "Just now";
@@ -109,6 +144,7 @@ function formatDate(timestamp) {
     timeStyle: "short"
   }).format(timestamp.toDate());
 }
+
 
 function setStatus(message, type = "") {
   if (!statusMessage) {
@@ -124,6 +160,7 @@ function setStatus(message, type = "") {
   }
 }
 
+
 function setSubmitLoading(isLoading) {
   if (!submitButton) {
     return;
@@ -138,7 +175,7 @@ function setSubmitLoading(isLoading) {
 
 
 /* =====================================================
-   EMPTY / ERROR STATES
+   EMPTY AND ERROR STATES
 ===================================================== */
 
 function renderEmptyState() {
@@ -160,6 +197,7 @@ function renderEmptyState() {
     </div>
   `;
 }
+
 
 function renderErrorState() {
   if (!commentsContainer) {
@@ -190,18 +228,28 @@ function renderComments(snapshot) {
 
   commentsContainer.innerHTML = snapshot.docs
     .map((documentSnapshot) => {
-      const comment = documentSnapshot.data();
+      const comment =
+        documentSnapshot.data();
+
+      const commentAuthorUid =
+        cleanValue(comment.authorUid);
+
+      const commentAuthorEmail =
+        cleanValue(comment.authorEmail)
+          .toLowerCase();
 
       const commentIsOwner =
-        comment.authorUid === OWNER_UID;
+        commentAuthorUid === cleanValue(OWNER_UID) ||
+        commentAuthorEmail ===
+          cleanValue(OWNER_EMAIL).toLowerCase();
 
       const ownerBadge = commentIsOwner
         ? `
           <span
             class="guestbook-op-badge"
-            title="Original poster"
+            title="Website owner"
           >
-            OP
+            ✦ OP
           </span>
         `
         : "";
@@ -210,10 +258,16 @@ function renderComments(snapshot) {
         ? " guestbook-comment-owner"
         : "";
 
+      const avatarSymbol = commentIsOwner
+        ? "✧"
+        : "✦";
+
       return `
         <article
           class="guestbook-comment${ownerClass}"
-          data-comment-id="${escapeHTML(documentSnapshot.id)}"
+          data-comment-id="${escapeHTML(
+            documentSnapshot.id
+          )}"
         >
 
           <div class="guestbook-comment-header">
@@ -222,20 +276,24 @@ function renderComments(snapshot) {
               class="guestbook-avatar"
               aria-hidden="true"
             >
-              ${commentIsOwner ? "✧" : "✦"}
+              ${avatarSymbol}
             </div>
+
 
             <div class="guestbook-comment-meta">
 
               <div class="guestbook-name-row">
 
                 <h3>
-                  ${escapeHTML(comment.name || "Guest")}
+                  ${escapeHTML(
+                    comment.name || "Guest"
+                  )}
                 </h3>
 
                 ${ownerBadge}
 
               </div>
+
 
               <time>
                 ${formatDate(comment.createdAt)}
@@ -245,9 +303,11 @@ function renderComments(snapshot) {
 
           </div>
 
+
           <p>
-            ${escapeHTML(comment.message || "")
-              .replace(/\n/g, "<br>")}
+            ${escapeHTML(
+              comment.message || ""
+            ).replace(/\n/g, "<br>")}
           </p>
 
         </article>
@@ -265,6 +325,7 @@ const commentsQuery = query(
   collection(db, "guestbookMessages"),
   orderBy("createdAt", "desc")
 );
+
 
 onSnapshot(
   commentsQuery,
@@ -334,10 +395,17 @@ form?.addEventListener(
       const currentUser =
         auth.currentUser;
 
-      const authorUid =
-        isOwnerUser(currentUser)
-          ? currentUser.uid
-          : null;
+      const ownerIsPosting =
+        isOwnerUser(currentUser);
+
+      const authorUid = ownerIsPosting
+        ? cleanValue(currentUser.uid)
+        : null;
+
+      const authorEmail = ownerIsPosting
+        ? cleanValue(currentUser.email)
+            .toLowerCase()
+        : null;
 
       await addDoc(
         collection(
@@ -349,14 +417,27 @@ form?.addEventListener(
           name,
           message,
           authorUid,
+          authorEmail,
+          isOwner: ownerIsPosting,
           createdAt: serverTimestamp()
         }
       );
 
       form.reset();
 
+      /*
+        Put Amy back into the nickname input
+        after an owner message is posted.
+      */
+      if (
+        ownerIsPosting &&
+        nameInput
+      ) {
+        nameInput.value = "Amy";
+      }
+
       setStatus(
-        authorUid
+        ownerIsPosting
           ? "Your OP message was sent! ✨"
           : "Message sent! ✨",
         "success"
@@ -379,7 +460,7 @@ form?.addEventListener(
 
 
 /* =====================================================
-   OWNER LOGIN
+   OWNER LOGIN BUTTON
 ===================================================== */
 
 ownerLoginButton?.addEventListener(
@@ -419,14 +500,27 @@ onAuthStateChanged(
   auth,
 
   (user) => {
+    const ownerIsLoggedIn =
+      isOwnerUser(user);
+
     console.log(
-      "CURRENT LOGGED-IN UID:",
-      user?.uid
+      "CURRENT UID:",
+      JSON.stringify(user?.uid || null)
     );
 
     console.log(
       "EXPECTED OWNER UID:",
-      OWNER_UID
+      JSON.stringify(OWNER_UID)
+    );
+
+    console.log(
+      "CURRENT EMAIL:",
+      user?.email || null
+    );
+
+    console.log(
+      "IS OWNER:",
+      ownerIsLoggedIn
     );
 
     if (
@@ -436,11 +530,14 @@ onAuthStateChanged(
       return;
     }
 
-    if (isOwnerUser(user)) {
+
+    /* Owner is logged in */
+    if (ownerIsLoggedIn) {
       ownerLoginStatus.textContent =
         `Owner logged in as ${
           user.displayName ||
-          user.email
+          user.email ||
+          "Amy"
         }`;
 
       ownerLoginButton.textContent =
@@ -454,9 +551,18 @@ onAuthStateChanged(
         "guestbook-owner-logged-in"
       );
 
+      if (
+        nameInput &&
+        !nameInput.value.trim()
+      ) {
+        nameInput.value = "Amy";
+      }
+
       return;
     }
 
+
+    /* A different Google account is logged in */
     if (user) {
       ownerLoginStatus.textContent =
         "This Google account is not the owner.";
@@ -475,6 +581,8 @@ onAuthStateChanged(
       return;
     }
 
+
+    /* Nobody is logged in */
     ownerLoginStatus.textContent =
       "Not logged in";
 
