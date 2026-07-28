@@ -124,6 +124,35 @@ const ownerLoginButton =
 const ownerLoginStatus =
   document.querySelector("#ownerLoginStatus");
 
+const replyModal =
+  document.querySelector("#guestbookReplyModal");
+
+const replyModalClose =
+  document.querySelector("#replyModalClose");
+
+const replyModalCancel =
+  document.querySelector("#replyModalCancel");
+
+const replyModalName =
+  document.querySelector("#replyModalName");
+
+const replyForm =
+  document.querySelector("#guestbookReplyForm");
+
+const replyNameInput =
+  document.querySelector("#guestbookReplyName");
+
+const replyMessageInput =
+  document.querySelector("#guestbookReplyMessage");
+
+const replyStatus =
+  document.querySelector("#guestbookReplyStatus");
+
+const replySubmitButton =
+  document.querySelector("#guestbookReplySubmit");
+
+let activeReplyCommentId = null;
+
 
 /* =====================================================
    REPLY LISTENERS
@@ -348,13 +377,6 @@ function renderComments(snapshot) {
             </div>
 
 
-            <div
-              class="guestbook-reply-form-container"
-              id="replyFormContainer-${escapeHTML(commentId)}"
-              hidden
-            >
-            </div>
-
 
             <div
               class="guestbook-replies"
@@ -418,58 +440,49 @@ function renderReplies(
 
         return `
           <article
-            class="guestbook-reply${ownerClass}"
+            class="guestbook-reply-card${ownerClass}"
             data-reply-id="${escapeHTML(replyDocument.id)}"
           >
 
-            <div class="guestbook-reply-line">
-              ↳
-            </div>
+            <div class="guestbook-reply-card-top">
 
-
-            <div class="guestbook-reply-content">
-
-              <div class="guestbook-reply-header">
-
-                <div
-                  class="guestbook-reply-avatar"
-                  aria-hidden="true"
-                >
-                  ${replyIsOwner ? "✧" : "✦"}
-                </div>
-
-
-                <div>
-
-                  <div class="guestbook-name-row">
-
-                    <h4>
-                      ${escapeHTML(
-                        reply.name || "Guest"
-                      )}
-                    </h4>
-
-                    ${ownerBadge}
-
-                  </div>
-
-
-                  <time>
-                    ${formatDate(reply.createdAt)}
-                  </time>
-
-                </div>
-
+              <div
+                class="guestbook-reply-avatar"
+                aria-hidden="true"
+              >
+                ${replyIsOwner ? "✧" : "✦"}
               </div>
 
 
-              <p>
-                ${escapeHTML(
-                  reply.message || ""
-                ).replace(/\n/g, "<br>")}
-              </p>
+              <div class="guestbook-reply-card-meta">
+
+                <div class="guestbook-name-row">
+
+                  <h4>
+                    ${escapeHTML(
+                      reply.name || "Guest"
+                    )}
+                  </h4>
+
+                  ${ownerBadge}
+
+                </div>
+
+
+                <time>
+                  ${formatDate(reply.createdAt)}
+                </time>
+
+              </div>
 
             </div>
+
+
+            <p class="guestbook-reply-card-message">
+              ${escapeHTML(
+                reply.message || ""
+              ).replace(/\n/g, "<br>")}
+            </p>
 
           </article>
         `;
@@ -662,7 +675,7 @@ form?.addEventListener(
 
 
 /* =====================================================
-   OPEN AND CLOSE REPLY FORM
+   OPEN AND CLOSE REPLY MODAL
 ===================================================== */
 
 commentsContainer?.addEventListener(
@@ -674,175 +687,222 @@ commentsContainer?.addEventListener(
         ".guestbook-reply-button"
       );
 
-    if (replyButton) {
-      const commentId =
-        replyButton.dataset.replyTo;
-
-      openReplyForm(commentId);
-
+    if (!replyButton) {
       return;
     }
 
+    const commentId =
+      replyButton.dataset.replyTo;
 
-    const cancelButton =
-      event.target.closest(
-        ".guestbook-reply-cancel"
+    const commentCard =
+      replyButton.closest(
+        ".guestbook-comment"
       );
 
-    if (cancelButton) {
-      const commentId =
-        cancelButton.dataset.cancelReply;
+    const commentName =
+      commentCard
+        ?.querySelector(
+          ".guestbook-comment-meta h3"
+        )
+        ?.textContent
+        ?.trim() || "this message";
 
-      closeReplyForm(commentId);
+    openReplyModal(
+      commentId,
+      commentName
+    );
+  }
+);
+
+
+function setReplyStatus(
+  message,
+  type = ""
+) {
+  if (!replyStatus) {
+    return;
+  }
+
+  replyStatus.textContent =
+    message;
+
+  if (type) {
+    replyStatus.dataset.type =
+      type;
+  } else {
+    delete replyStatus.dataset.type;
+  }
+}
+
+
+function setReplyLoading(isLoading) {
+  if (!replySubmitButton) {
+    return;
+  }
+
+  replySubmitButton.disabled =
+    isLoading;
+
+  replySubmitButton.textContent =
+    isLoading
+      ? "Sending..."
+      : "Send reply";
+}
+
+
+function openReplyModal(
+  commentId,
+  commentName = "this message"
+) {
+  if (
+    !replyModal ||
+    !replyForm
+  ) {
+    console.error(
+      "Reply modal HTML is missing."
+    );
+
+    return;
+  }
+
+  activeReplyCommentId =
+    commentId;
+
+  replyForm.reset();
+
+  const ownerIsLoggedIn =
+    isOwnerUser(auth.currentUser);
+
+  if (replyNameInput) {
+    replyNameInput.value =
+      ownerIsLoggedIn
+        ? "Amy"
+        : "";
+  }
+
+  if (replyModalName) {
+    replyModalName.textContent =
+      `Replying to ${commentName}`;
+  }
+
+  setReplyStatus("");
+  setReplyLoading(false);
+
+  replyModal.hidden = false;
+  replyModal.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+  document.body.classList.add(
+    "guestbook-modal-open"
+  );
+
+  window.requestAnimationFrame(() => {
+    replyModal.classList.add(
+      "is-open"
+    );
+
+    if (
+      ownerIsLoggedIn &&
+      replyMessageInput
+    ) {
+      replyMessageInput.focus();
+    } else {
+      replyNameInput?.focus();
+    }
+  });
+}
+
+
+function closeReplyModal() {
+  if (!replyModal) {
+    return;
+  }
+
+  replyModal.classList.remove(
+    "is-open"
+  );
+
+  replyModal.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+  document.body.classList.remove(
+    "guestbook-modal-open"
+  );
+
+  window.setTimeout(() => {
+    replyModal.hidden = true;
+  }, 180);
+
+  activeReplyCommentId = null;
+
+  replyForm?.reset();
+  setReplyStatus("");
+  setReplyLoading(false);
+}
+
+
+replyModalClose?.addEventListener(
+  "click",
+  closeReplyModal
+);
+
+
+replyModalCancel?.addEventListener(
+  "click",
+  closeReplyModal
+);
+
+
+replyModal?.addEventListener(
+  "click",
+
+  (event) => {
+    if (
+      event.target === replyModal
+    ) {
+      closeReplyModal();
     }
   }
 );
 
 
-function openReplyForm(commentId) {
-  const container =
-    document.getElementById(
-      `replyFormContainer-${commentId}`
-    );
+document.addEventListener(
+  "keydown",
 
-  if (!container) {
-    return;
+  (event) => {
+    if (
+      event.key === "Escape" &&
+      replyModal &&
+      !replyModal.hidden
+    ) {
+      closeReplyModal();
+    }
   }
-
-  const ownerIsLoggedIn =
-    isOwnerUser(auth.currentUser);
-
-  const defaultName =
-    ownerIsLoggedIn
-      ? "Amy"
-      : "";
-
-  container.innerHTML = `
-    <form
-      class="guestbook-reply-form"
-      data-comment-id="${escapeHTML(commentId)}"
-    >
-
-      <p class="small-label">
-        Write a reply
-      </p>
-
-
-      <input
-        class="guestbook-reply-name"
-        type="text"
-        maxlength="30"
-        placeholder="Your nickname"
-        value="${escapeHTML(defaultName)}"
-        required
-      >
-
-
-      <textarea
-        class="guestbook-reply-message"
-        maxlength="500"
-        rows="4"
-        placeholder="Write your reply..."
-        required
-      ></textarea>
-
-
-      <p
-        class="guestbook-reply-status"
-        aria-live="polite"
-      ></p>
-
-
-      <div class="guestbook-reply-form-actions">
-
-        <button
-          class="guestbook-reply-cancel"
-          type="button"
-          data-cancel-reply="${escapeHTML(commentId)}"
-        >
-          Cancel
-        </button>
-
-
-        <button
-          class="primary-button guestbook-reply-submit"
-          type="submit"
-        >
-          Send reply
-        </button>
-
-      </div>
-
-    </form>
-  `;
-
-  container.hidden = false;
-
-  const replyTextarea =
-    container.querySelector(
-      ".guestbook-reply-message"
-    );
-
-  replyTextarea?.focus();
-}
-
-
-function closeReplyForm(commentId) {
-  const container =
-    document.getElementById(
-      `replyFormContainer-${commentId}`
-    );
-
-  if (!container) {
-    return;
-  }
-
-  container.hidden = true;
-  container.innerHTML = "";
-}
+);
 
 
 /* =====================================================
    POST REPLY
 ===================================================== */
 
-commentsContainer?.addEventListener(
+replyForm?.addEventListener(
   "submit",
 
   async (event) => {
-    const replyForm =
-      event.target.closest(
-        ".guestbook-reply-form"
-      );
-
-    if (!replyForm) {
-      return;
-    }
-
     event.preventDefault();
 
-    const commentId =
-      replyForm.dataset.commentId;
-
-    const replyNameInput =
-      replyForm.querySelector(
-        ".guestbook-reply-name"
+    if (!activeReplyCommentId) {
+      setReplyStatus(
+        "Please choose a message to reply to.",
+        "error"
       );
 
-    const replyMessageInput =
-      replyForm.querySelector(
-        ".guestbook-reply-message"
-      );
-
-    const replyStatus =
-      replyForm.querySelector(
-        ".guestbook-reply-status"
-      );
-
-    const replySubmitButton =
-      replyForm.querySelector(
-        ".guestbook-reply-submit"
-      );
+      return;
+    }
 
     const name =
       replyNameInput?.value.trim() || "";
@@ -851,37 +911,34 @@ commentsContainer?.addEventListener(
       replyMessageInput?.value.trim() || "";
 
     if (!name || !message) {
-      if (replyStatus) {
-        replyStatus.textContent =
-          "Please enter a nickname and reply.";
-      }
+      setReplyStatus(
+        "Please enter a nickname and reply.",
+        "error"
+      );
 
       return;
     }
 
     if (name.length > 30) {
-      if (replyStatus) {
-        replyStatus.textContent =
-          "Your nickname is too long.";
-      }
+      setReplyStatus(
+        "Your nickname can contain a maximum of 30 characters.",
+        "error"
+      );
 
       return;
     }
 
     if (message.length > 500) {
-      if (replyStatus) {
-        replyStatus.textContent =
-          "Your reply is too long.";
-      }
+      setReplyStatus(
+        "Your reply can contain a maximum of 500 characters.",
+        "error"
+      );
 
       return;
     }
 
-    if (replySubmitButton) {
-      replySubmitButton.disabled = true;
-      replySubmitButton.textContent =
-        "Sending...";
-    }
+    setReplyLoading(true);
+    setReplyStatus("");
 
     try {
       const currentUser =
@@ -894,7 +951,7 @@ commentsContainer?.addEventListener(
         collection(
           db,
           "guestbookMessages",
-          commentId,
+          activeReplyCommentId,
           "replies"
         ),
 
@@ -920,23 +977,19 @@ commentsContainer?.addEventListener(
         }
       );
 
-      closeReplyForm(commentId);
+      closeReplyModal();
     } catch (error) {
       console.error(
         "Could not post reply:",
         error
       );
 
-      if (replyStatus) {
-        replyStatus.textContent =
-          "Something went wrong. Please try again.";
-      }
+      setReplyStatus(
+        "Something went wrong. Please try again.",
+        "error"
+      );
 
-      if (replySubmitButton) {
-        replySubmitButton.disabled = false;
-        replySubmitButton.textContent =
-          "Send reply";
-      }
+      setReplyLoading(false);
     }
   }
 );
