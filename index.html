@@ -4,12 +4,6 @@
 <head>
   <meta charset="UTF-8">
 
-  <meta<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
@@ -23,6 +17,30 @@
   <title>Amy's Website</title>
 
   <link rel="stylesheet" href="style.css">
+
+  <!-- Lottie player for the animated butterfly -->
+  <script
+    type="module"
+    src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
+  ></script>
+
+  <style>
+    .orbit-butterfly {
+      width: 74px;
+      height: 74px;
+      right: -38px;
+      overflow: visible;
+    }
+
+    @media (max-width: 600px) {
+      .orbit-butterfly {
+        width: 58px;
+        height: 58px;
+        right: -30px;
+      }
+    }
+  </style>
+
 </head>
 
 
@@ -160,7 +178,15 @@
         </div>
 
         <div class="orbit orbit-three">
-          <span class="orbit-object">🦋</span>
+          <dotlottie-player
+            class="orbit-object orbit-butterfly"
+            src="ani/Butterfly Lottie Animation.lottie"
+            background="transparent"
+            speed="1"
+            loop
+            autoplay
+            aria-hidden="true"
+          ></dotlottie-player>
         </div>
 
 
