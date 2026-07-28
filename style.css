@@ -372,86 +372,6 @@ section {
 
 
 /* =========================================================
-   7. FLOATING DECORATIONS
-========================================================= */
-
-.floating-decorations {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.floating-symbol,
-.floating-butterfly {
-  position: absolute;
-
-  opacity: 0.45;
-
-  filter:
-    drop-shadow(0 0 8px currentColor);
-}
-
-.floating-symbol {
-  color: var(--purple-light);
-  font-size: 22px;
-
-  animation:
-    symbolFloat 8s ease-in-out infinite;
-}
-
-.symbol-one {
-  top: 18%;
-  left: 7%;
-}
-
-.symbol-two {
-  top: 72%;
-  left: 10%;
-  animation-delay: -2s;
-}
-
-.symbol-three {
-  top: 24%;
-  right: 8%;
-  animation-delay: -4s;
-}
-
-.symbol-four {
-  right: 14%;
-  bottom: 18%;
-  animation-delay: -6s;
-}
-
-.floating-butterfly {
-  font-size: 28px;
-  opacity: 0.4;
-
-  animation:
-    butterflyFloat 14s ease-in-out infinite;
-}
-
-.butterfly-one {
-  top: 22%;
-  left: 16%;
-}
-
-.butterfly-two {
-  top: 60%;
-  right: 12%;
-  animation-delay: -5s;
-}
-
-.butterfly-three {
-  bottom: 8%;
-  left: 48%;
-  animation-delay: -9s;
-}
-
-
-/* =========================================================
    8. HEADER
 ========================================================= */
 
@@ -2475,47 +2395,6 @@ section {
   }
 }
 
-@keyframes symbolFloat {
-  0%,
-  100% {
-    transform:
-      translateY(0)
-      rotate(0deg);
-  }
-
-  50% {
-    transform:
-      translateY(-25px)
-      rotate(20deg);
-  }
-}
-
-@keyframes butterflyFloat {
-  0%,
-  100% {
-    transform:
-      translate3d(0, 0, 0)
-      rotate(-8deg);
-  }
-
-  25% {
-    transform:
-      translate3d(22px, -28px, 0)
-      rotate(8deg);
-  }
-
-  50% {
-    transform:
-      translate3d(-8px, -50px, 0)
-      rotate(-4deg);
-  }
-
-  75% {
-    transform:
-      translate3d(-28px, -18px, 0)
-      rotate(10deg);
-  }
-}
 
 @keyframes logoTwinkle {
   0%,
