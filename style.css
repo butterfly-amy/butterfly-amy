@@ -186,13 +186,26 @@ section {
 
   background:
     linear-gradient(
-      180deg,
-      rgba(2, 2, 10, 0.35),
-      rgba(2, 2, 10, 0.78)
-    );
+      rgba(4,4,14,0.38),
+      rgba(4,4,14,0.72)
+    ),
+    url("cover/Tumblr_ Image.jpg") center center / cover no-repeat;
 }
 
 .cosmic-background::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(circle at 50% 80%,
+      rgba(210,170,255,.08),
+      transparent 45%);
+
+  mix-blend-mode: screen;
+}
+
   content: "";
 
   position: absolute;
@@ -230,6 +243,8 @@ section {
 }
 
 .stars-small {
+  display:none;
+
   display: none;
   opacity: 0;
 
@@ -247,6 +262,8 @@ section {
 }
 
 .stars-medium {
+  display:none;
+
   display: none;
   opacity: 0;
 
@@ -265,6 +282,8 @@ section {
 }
 
 .stars-large {
+  display:none;
+
   display: none;
   opacity: 0;
 
@@ -289,7 +308,7 @@ section {
   height: 520px;
 
   border-radius: 50%;
-  opacity: 0.12;
+  opacity: 0.06;
 
   background:
     radial-gradient(
@@ -338,6 +357,8 @@ section {
 }
 
 .shooting-stars {
+  display:none;
+
   position: absolute;
   inset: 0;
 }
