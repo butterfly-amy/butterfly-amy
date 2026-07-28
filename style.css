@@ -988,6 +988,26 @@ section {
   font-size: 27px;
 }
 
+
+/* Real animated Lottie butterfly inside the third orbit */
+.orbit-butterfly {
+  display: block;
+
+  width: 74px;
+  height: 74px;
+
+  right: -38px;
+
+  color: transparent;
+
+  overflow: visible;
+  pointer-events: none;
+
+  filter:
+    drop-shadow(0 0 8px rgba(199, 168, 255, 0.7))
+    drop-shadow(0 0 18px rgba(143, 184, 255, 0.28));
+}
+
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
@@ -2912,6 +2932,14 @@ section {
   .footer-links {
     gap: 16px;
   }
+
+  .orbit-butterfly {
+    width: 58px;
+    height: 58px;
+
+    right: -30px;
+  }
+
 }
 
 
