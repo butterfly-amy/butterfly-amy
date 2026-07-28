@@ -4516,7 +4516,82 @@
 
 
   <script src="app.js"></script>
-  <script type="module" src="guestbook.js?v=6"></script>
+  <script type="module" src="guestbook.js?v=7"></script>
+
+    <div
+    class="guestbook-reply-modal"
+    id="guestbookReplyModal"
+    aria-hidden="true"
+    hidden
+  >
+    <div
+      class="guestbook-reply-modal-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="replyModalTitle"
+    >
+      <button
+        class="guestbook-reply-modal-close"
+        id="replyModalClose"
+        type="button"
+        aria-label="Close reply window"
+      >
+        ×
+      </button>
+  
+      <p class="small-label">
+        Write a reply
+      </p>
+  
+      <h2 id="replyModalTitle">
+        Leave a reply
+      </h2>
+  
+      <p id="replyModalName">
+        Replying to this message
+      </p>
+  
+      <form id="guestbookReplyForm">
+        <input
+          id="guestbookReplyName"
+          type="text"
+          maxlength="30"
+          placeholder="Your nickname"
+          required
+        >
+  
+        <textarea
+          id="guestbookReplyMessage"
+          maxlength="500"
+          rows="5"
+          placeholder="Write your reply..."
+          required
+        ></textarea>
+  
+        <p
+          id="guestbookReplyStatus"
+          aria-live="polite"
+        ></p>
+  
+        <div class="guestbook-reply-modal-actions">
+          <button
+            id="replyModalCancel"
+            type="button"
+          >
+            Cancel
+          </button>
+  
+          <button
+            class="primary-button"
+            id="guestbookReplySubmit"
+            type="submit"
+          >
+            Send reply
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
 </body>
 
